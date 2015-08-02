@@ -3,6 +3,6 @@
 /simbuild
 
 # TOSSIM build files
-TOSSIM.py
+*TOSSIM*.*
 _TOSSIMmodule.so
 app.xml
