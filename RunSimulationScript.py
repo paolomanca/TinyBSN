@@ -50,6 +50,8 @@ t.addChannel("radio_rec",out);
 #t.addChannel("radio_pack",out);
 print "Activate debug message on channel role"
 t.addChannel("role",out);
+print "Activate debug message on channel role_fine"
+t.addChannel("role_fine",out);
 
 for i in range(0,5):
 	print "Creating node %d ..." % (i);
@@ -98,8 +100,8 @@ for i in range(0,5):
 
 print "Start simulation with TOSSIM! \n\n\n";
 
-for i in range(0,100):
+for i in range(0,15000):
 	t.runNextEvent()
 	
-print "\n\n\nSimulation finished!";
+print "\n\nSimulation finished!";
 
