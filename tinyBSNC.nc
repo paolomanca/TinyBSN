@@ -1,15 +1,23 @@
 /**
- *  Source file for implementation of module sendAckC in which
- *  the node 1 send a request to node 2 until it receives a response.
- *  The reply message contains a reading from the Fake Sensor.
+ *  Source file for implementation of module tinyBSN, which implements
+ *  a Body Sensor Network (BSN) composed of four wireless accelerometers
+ *  (two for the wrists, and two for the ankles) and one wireless
+ *  ElectroCardioGram (ECG) sensor, mounted on the chest.
+ *  The BSN is organized in a star topology, with the ECG sensor acting
+ *  as the central node (CN). The CN is also responsible for controlling
+ *  the peripheral nodes (PN), by triggering the monitoring process.
  *
- *  @author Luca Pietro Borsani
+ *  Code managing the comunications from PNs to the CN's taken from the
+ *  module sendAck by Luca Pietro Borsani.
+ *
+ *  @author Paolo Manca
+ * 
  */
 
 #include "sendAck.h"
 #include "Timer.h"
 
-module sendAckC {
+module tinyBSNC {
 
   uses {
 	interface Boot;

@@ -1,17 +1,20 @@
 /**
- *  Configuration file for wiring of sendAckC module to other common 
+ *  Configuration file for wiring of tinyBSNC module to other common 
  *  components needed for proper functioning
  *
- *  @author Luca Pietro Borsani
+ *  Code managing the comunications from PNs to the CN's taken from the
+ *  module sendAck by Luca Pietro Borsani.
+ *
+ *  @author Paolo Manca
  */
 
 #include "sendAck.h"
 
-configuration sendAckAppC {}
+configuration tinyBSNAppC {}
 
 implementation {
 
-  components MainC, sendAckC as App;
+  components MainC, tinyBSNC as App;
   components new AMSenderC(AM_MY_MSG);
   components new AMReceiverC(AM_MY_MSG);
   components ActiveMessageC;
