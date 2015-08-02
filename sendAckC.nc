@@ -40,11 +40,11 @@ module sendAckC {
 	mess->msg_type = REQ;
 	mess->msg_id = counter++;
 	    
-	dbg("radio_send", "Try to send a request to node 2 at time %s \n", sim_time_string());
+	dbg("radio_send", "Try to send a request to node 0 at time %s \n", sim_time_string());
     
 	call PacketAcknowledgements.requestAck( &packet );
 
-	if(call AMSend.send(2,&packet,sizeof(my_msg_t)) == SUCCESS){
+	if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
 		
 	  dbg("radio_send", "Packet passed to lower layer successfully!\n");
 	  dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n", call Packet.payloadLength( &packet ) );
@@ -79,8 +79,8 @@ module sendAckC {
     if(err == SUCCESS) {
 
 	dbg("radio","Radio on!\n");
-	if ( TOS_NODE_ID == 1 ) {
-	  dbg("role","I'm node 1: start sending periodical request\n");
+	if ( TOS_NODE_ID != 0 ) {
+	  dbg("role","I'm node %d: start sending periodical request\n", TOS_NODE_ID);
 	  call MilliTimer.startPeriodic( 800 );
 	}
     }
