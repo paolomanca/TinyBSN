@@ -8,7 +8,7 @@
  *  @author Paolo Manca
  */
 
-#include "sendAck.h"
+#include "tinyBSN.h"
 
 configuration tinyBSNAppC {}
 
@@ -40,7 +40,7 @@ implementation {
   App.MilliTimer -> TimerMilliC;
 
   //Fake Sensor read
-  App.Read -> FakeSensorC;
+  App.AccSensor -> FakeSensorC;
 
 }
 
