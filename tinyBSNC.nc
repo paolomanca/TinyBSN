@@ -33,6 +33,8 @@ module tinyBSNC {
 
 } implementation {
 
+  uint8_t classification;
+
   uint16_t buffer[BUF_SIZE];
   uint8_t buf_count = 0;
 
@@ -74,7 +76,35 @@ module tinyBSNC {
 
   //***************** Task sense from accelerometer *****************//
   task void classify() {
-	dbg("role", "Started classification");
+	uint8_t i;
+	float sum = 0;
+	float avg;
+
+	dbg("role", "Rescaling values:\n");
+	
+	for(i=0; i<BUF_SIZE; i++) {
+		sum += (float)buffer[i]*10/65535; // 2^16-1
+		dbg("role_fine", "Scaling [%d]: %d -> %f\n", i, buffer[i], (float)buffer[i]*10/65535);
+	}
+
+	dbg("role", "Rescaling finished.\n");
+
+	avg = sum/BUF_SIZE;
+	dbg("role", "Sample average: %f (sum: %f)\n", avg, sum);
+
+	dbg("role", "Classified as ");
+	if ( avg < M_THR ) {
+		classification = NO_MOVEMENT;
+		dbg_clear("role", "NO_MOVEMENT (avg < M_THR)\n");
+	} else if ( avg > C_THR ) {
+		classification = CRISIS;
+		dbg_clear("role", "CRISIS (avg > C_THR)\n");
+	} else {
+		classification = MOVEMENT;
+		dbg_clear("role", "MOVEMENT (M_THR <= avg <= C_THR)\n");
+	}
+	
+	
   }
 
   //***************** Task send request ********************//
@@ -136,7 +166,7 @@ module tinyBSNC {
 
   //***************** MilliTimer interface ********************//
   event void MilliTimer.fired() {
-	dbg("role", "Timer fired! Time to sense!\n");
+	dbg("role_fine", "Timer fired! Time to sense!\n");
 	if(TOS_NODE_ID != 0) {
 		call AccSensor.read();
 	}
@@ -184,8 +214,8 @@ module tinyBSNC {
 	
 	if ( TOS_NODE_ID != 0 ) {
 		if ( mess->msg_type == REQ && mess->value == START ) {
-			dbg("role", "Starting the timer. \n");
-			call MilliTimer.startPeriodic(500); // 20Hz
+			dbg("role", "Starting timer for acquisition. \n");
+			call MilliTimer.startPeriodic(50); // 20Hz
 		}
 	} else {
 	}
@@ -197,11 +227,11 @@ module tinyBSNC {
   //************************* Read interface **********************//
   event void AccSensor.readDone(error_t result, uint16_t data) {
 	if ( buf_count < BUF_SIZE ) {
-		dbg("role", "Sensed new data from accelerometer. Storing it in buffer at position %d\n", buf_count);
+		dbg("role_fine", "Sensed new data from accelerometer. Storing value %d in buffer at position %d\n", data, buf_count);
 		buffer[buf_count] = data;
 		buf_count++;
 	} else {
-		dbg("role", "Buffer full");
+		dbg("role", "Buffer full!\n");
 		post classify();
 		buf_count = 0;
 		call MilliTimer.stop();
