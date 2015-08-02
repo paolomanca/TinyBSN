@@ -1,0 +1,8 @@
+# Build folders
+/build
+/simbuild
+
+# TOSSIM build files
+TOSSIM.py
+_TOSSIMmodule.so
+app.xml
