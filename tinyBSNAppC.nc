@@ -14,33 +14,34 @@ configuration tinyBSNAppC {}
 
 implementation {
 
-  components MainC, tinyBSNC as App;
-  components new AMSenderC(AM_MY_MSG);
-  components new AMReceiverC(AM_MY_MSG);
-  components ActiveMessageC;
-  components new TimerMilliC();
-  components new FakeSensorC();
+    components MainC, tinyBSNC as App;
+    components new AMSenderC(AM_MY_MSG);
+    components new AMReceiverC(AM_MY_MSG);
+    components ActiveMessageC;
+    components new TimerMilliC();
+    components new FakeSensorC() as Accelerometer;
+    components new FakeSensorC() as ECG;
 
-  //Boot interface
-  App.Boot -> MainC.Boot;
+    //Boot interface
+    App.Boot -> MainC.Boot;
 
-  //Send and Receive interfaces
-  App.Receive -> AMReceiverC;
-  App.AMSend -> AMSenderC;
+    //Send and Receive interfaces
+    App.Receive -> AMReceiverC;
+    App.AMSend -> AMSenderC;
 
-  //Radio Control
-  App.SplitControl -> ActiveMessageC;
+    //Radio Control
+    App.SplitControl -> ActiveMessageC;
 
-  //Interfaces to access package fields
-  App.AMPacket -> AMSenderC;
-  App.Packet -> AMSenderC;
-  App.PacketAcknowledgements->ActiveMessageC;
+    //Interfaces to access package fields
+    App.AMPacket -> AMSenderC;
+    App.Packet -> AMSenderC;
+    App.PacketAcknowledgements->ActiveMessageC;
 
-  //Timer interface
-  App.MilliTimer -> TimerMilliC;
+    //Timer interface
+    App.MilliTimer -> TimerMilliC;
 
-  //Fake Sensor read
-  App.AccSensor -> FakeSensorC;
+    //Sensors
+    App.AccSensor -> Accelerometer;
+    App.ECGSensor -> ECG;
 
 }
-
