@@ -254,7 +254,7 @@ module tinyBSNC {
 
             call Timeout.stop();
 
-            if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
+            if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
                 dbg("role_coarse","[%s] At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n", sim_time_string());
                 call ECGSensor.read();
             } else {
