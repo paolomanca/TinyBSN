@@ -108,14 +108,15 @@ module tinyBSNC {
 	
   }
 
-  //***************** Task send request ********************//
-  task void sendReq() {
+  //***************** Task send classification ********************//
+  task void sendClass() {
 
 	my_msg_t* mess=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
-	mess->msg_type = REQ;
+	mess->msg_type = RES;
 	mess->msg_id = msg_count++;
+	mess->value = classification;
 	    
-	dbg("radio_send", "Try to send a request to node 0 at time %s \n", sim_time_string());
+	dbg("radio_send", "Try to send classification to node 0 at time %s \n", sim_time_string());
     
 	call PacketAcknowledgements.requestAck( &packet );
 
