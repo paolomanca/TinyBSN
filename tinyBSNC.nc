@@ -27,6 +27,7 @@ module tinyBSNC {
         interface SplitControl;
         interface Receive;
         interface Timer<TMilli> as MilliTimer;
+        interface Timer<TMilli> as Timeout;
         interface Read<uint16_t> as AccSensor;
     interface SplitControl as AccSensorS;
         interface Read<uint16_t> as ECGSensor;
@@ -39,6 +40,7 @@ module tinyBSNC {
      * Useful variable for loops
      */
     uint8_t i;
+    uint8_t timeout = 0;
 
     /*
      * Counter variable
@@ -187,30 +189,32 @@ module tinyBSNC {
      */
     task void sendClass() {
 
-        msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
-        msg->msg_type = RES;
-        msg->msg_id = msg_count++;
-        msg->value = class[0];
+	    if ( call Timeout.isRunning() == TRUE ) {
+            msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+            msg->msg_type = RES;
+            msg->msg_id = msg_count++;
+            msg->value = class[0];
 
-        dbg("radio_send", "[%s] Trying to send classification to node 0.\n", sim_time_string());
+            dbg("radio_send", "[%s] Trying to send classification to node 0.\n", sim_time_string());
 
-        call PacketAcknowledgements.requestAck( &packet );
+            call PacketAcknowledgements.requestAck( &packet );
 
-        if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
+            if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
 
-            dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
-            dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
-                call Packet.payloadLength(&packet) );
-            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
-            dbg_clear("radio_pack","\t Destination: %hhu \n ",
-                call AMPacket.destination(&packet) );
-            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
-            dbg_clear("radio_pack","\t\t Payload \n" );
-            dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
-            dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
-            dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
-            dbg_clear("radio_pack", "\n");
+                dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
+                dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
+                    call Packet.payloadLength(&packet) );
+                dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
+                dbg_clear("radio_pack","\t Destination: %hhu \n ",
+                    call AMPacket.destination(&packet) );
+                dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
+                dbg_clear("radio_pack","\t\t Payload \n" );
+                dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
+                dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
+                dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
+                dbg_clear("radio_pack", "\n");
 
+            }
         }
 
     }
@@ -224,8 +228,8 @@ module tinyBSNC {
         class[msg->value]++;
         count++;
 
-        if ( call MilliTimer.isRunning == FALSE ) {
-            call MilliTimer.startOneShot(500);
+        if ( call Timeout.isRunning() == FALSE ) {
+            call Timeout.startOneShot(15000);
         }
 
         dbg("role_coarse", "[%s] Received classification ", sim_time_string());
@@ -243,12 +247,12 @@ module tinyBSNC {
             default: break;
         }
 
-        dbg_clear("role_coarse", " from node %d (%d of %d).", call AMPacket.source(pack), count, N_PNS);
+        dbg_clear("role_coarse", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
 
         if ( count == N_PNS ) {
-            dbg_clear("role", " Last classification received!\n");
+            dbg("role", " Last classification received!\n");
 
-            call MilliTimer.stop();
+            call Timeout.stop();
 
             if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
                 dbg("role_coarse","[%s] At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n", sim_time_string());
@@ -278,7 +282,11 @@ module tinyBSNC {
 
             if ( TOS_NODE_ID == 0 ) {
                 post start();
-            }
+            } else {
+                dbg("role", "[%s] Starting accelerometer\n", sim_time_string());
+
+                call AccSensorS.start();
+	    }
 
         } else {
             call SplitControl.start();
@@ -291,15 +299,20 @@ module tinyBSNC {
 
     //***************** MilliTimer interface ********************//
     event void MilliTimer.fired() {
-        if ( TOS_NODE_ID == 0 ) {
-            dbg("role_coarse", "[%s] Timeout: at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string());
-            call start();
-        } else {
-            dbg("role_fine", "[%s] Timer fired! Time to sense!\n", sim_time_string());
-            call AccSensor.read();
-        }
+        dbg("role_fine", "[%s] Timer fired! Time to sense!\n", sim_time_string());
+        call AccSensor.read();
     }                 
 
+    event void Timeout.fired() {
+        timeout++;
+        if ( TOS_NODE_ID == 0 ) {
+            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeout);
+
+            post start();
+        } else {
+            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeout);
+        }
+    }
 
     //********************* AMSend interface ****************//
     event void AMSend.sendDone(message_t* buf,error_t err) {
@@ -321,6 +334,8 @@ module tinyBSNC {
                     } else {
                         count = 0;
                     }
+                } else {
+                    call Timeout.stop();
                 }
 
             } else {
@@ -357,16 +372,17 @@ module tinyBSNC {
         if ( TOS_NODE_ID == 0 ) {
             recClass(buf);
         } else {
+            dbg("role_coarse", "[%s] Starting acquisition.\n", sim_time_string());
 
             if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the counter
                 count = 0;
 
-                dbg("role", "[%s] Starting accelerometer\n", sim_time_string());
-                call AccSensorS.start();
-
                 dbg("role_fine", "[%s] Starting timer for acquisition.\n", sim_time_string());
                 call MilliTimer.startPeriodic(50); // 20Hz
+
+                dbg("role_fine", "[%s] Starting timer for timeout.\n", sim_time_string());
+                call Timeout.startOneShot(15000);
 
             } else {
                 dbg("role", "[%s] Acquisition already started!\n", sim_time_string());

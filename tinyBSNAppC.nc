@@ -17,7 +17,8 @@ implementation {
     components new AMSenderC(AM_MY_MSG);
     components new AMReceiverC(AM_MY_MSG);
     components ActiveMessageC;
-    components new TimerMilliC();
+    components new TimerMilliC() as TMilli;
+    components new TimerMilliC() as Timeout;
     components new ACCSensorC() as Accelerometer;
     components new FakeSensorC() as ECG;
 
@@ -37,7 +38,8 @@ implementation {
     App.PacketAcknowledgements->ActiveMessageC;
 
     //Timer interface
-    App.MilliTimer -> TimerMilliC;
+    App.MilliTimer -> TMilli;
+    App.Timeout -> Timeout;
 
     //Sensors
     App.AccSensor -> Accelerometer;
