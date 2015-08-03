@@ -49,7 +49,6 @@ module tinyBSNC {
 
     uint8_t msg_count = 0;
 
-    uint8_t rec_id;
     message_t packet;
 
     task void start();
@@ -233,7 +232,6 @@ module tinyBSNC {
     event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
         my_msg_t* mess=(my_msg_t*)payload;
-        rec_id = mess->msg_id;
 
         dbg("radio_rec","Message received at time %s \n", sim_time_string());
         dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength( buf ) );
@@ -249,7 +247,7 @@ module tinyBSNC {
         if ( TOS_NODE_ID != 0 ) {
 
             if ( mess->msg_type == REQ && mess->value == START ) {
-                
+
                 // Resetting the counter
                 count = 0;
 
