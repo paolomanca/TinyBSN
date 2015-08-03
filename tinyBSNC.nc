@@ -203,6 +203,10 @@ module tinyBSNC {
 		  dbg_clear("radio_ack", "and ack received");
 		} else {
 		  dbg_clear("radio_ack", "but ack was not received");
+
+		  if ( TOS_NODE_ID != 0 ) {
+			post sendClass();
+		  }
 		}
 		dbg_clear("radio_send", " at time %s \n\n", sim_time_string());
 	} else {
