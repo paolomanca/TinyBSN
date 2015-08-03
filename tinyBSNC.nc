@@ -28,7 +28,7 @@ module tinyBSNC {
         interface Receive;
         interface Timer<TMilli> as MilliTimer;
         interface Read<uint16_t> as AccSensor;
-	interface SplitControl as AccSensorS;
+    interface SplitControl as AccSensorS;
         interface Read<uint16_t> as ECGSensor;
     }
 
@@ -123,8 +123,8 @@ module tinyBSNC {
      * Only the CN should call this task.
      */
      task void start() {
-	dbg_clear("role_coarse", "\n");
-	dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
+        dbg_clear("role_coarse", "\n");
+        dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
         count = 0;
 
         for ( i=0; i<4; i++ ) {
@@ -224,33 +224,41 @@ module tinyBSNC {
         class[msg->value]++;
         count++;
 
-        dbg("role", "Received classification ");
+        if ( call MilliTimer.isRunning == FALSE ) {
+            call MilliTimer.startOneShot(500);
+        }
+
+        dbg("role_coarse", "Received classification ");
 
         switch(msg->value){
             case NO_MOVEMENT:
-                dbg_clear("role", "NO_MOVEMENT");
+                dbg_clear("role_coarse", "NO_MOVEMENT");
                 break;
             case MOVEMENT:
-                dbg_clear("role", "MOVEMENT");
+                dbg_clear("role_coarse", "MOVEMENT");
                 break;
             case CRISIS:
-                dbg_clear("role", "CRISIS");
+                dbg_clear("role_coarse", "CRISIS");
                 break;
             default: break;
         }
 
-        dbg_clear("role", " from node %d (%d of %d)\n", call AMPacket.source(pack), count, N_PNS);
+        dbg_clear("role_coarse", " from node %d (%d of %d).", call AMPacket.source(pack), count, N_PNS);
 
         if ( count == N_PNS ) {
-            dbg("role", "Last classification received\n");
+            dbg_clear("role", " Last classification received!\n");
+
+            call MilliTimer.stop();
 
             if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
                 dbg("role_coarse","At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
                 call ECGSensor.read();
             } else {
-                dbg("role_coarse", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
-                //post start();
+                dbg("role_coarse", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...\n");
+                post start();
             }
+        } else {
+            dbg_clear("role", "\n");
         }
 
     }     
@@ -283,9 +291,13 @@ module tinyBSNC {
 
     //***************** MilliTimer interface ********************//
     event void MilliTimer.fired() {
-        dbg("role_fine", "Timer fired! Time to sense!\n");
-
-        call AccSensor.read();
+        if ( TOS_NODE_ID == 0 ) {
+            dbg("role_coarse", "[%s] Timeout: at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string());
+            call start();
+        } else {
+            dbg("role_fine", "Timer fired! Time to sense!\n");
+            call AccSensor.read();
+        }
     }                 
 
 
@@ -322,7 +334,7 @@ module tinyBSNC {
                     post sendClass();
                 }
             }
-            dbg_clear("radio_send", " at time %s \n\n", sim_time_string());
+            dbg_clear("radio_send", " at time %s \n", sim_time_string());
         }
 
     }
@@ -350,14 +362,14 @@ module tinyBSNC {
             if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the counter
                 count = 0;
-		dbg("role", "Starting accelerometer\n");
-		call AccSensorS.start();
+        dbg("role", "Starting accelerometer\n");
+        call AccSensorS.start();
 
                 dbg("role", "Starting timer for acquisition.\n");
                 call MilliTimer.startPeriodic(50); // 20Hz
 
             } else {
-                dbg("role", "Acquisition already started");
+                dbg("role", "Acquisition already started!\n");
             }
         }
 
@@ -378,8 +390,8 @@ module tinyBSNC {
             // Stop the timer to stop getting samples
             call MilliTimer.stop();
 
-	    dbg("role", "Stopping accelerometer\n");
-	    call AccSensorS.stop();
+        dbg("role", "Stopping accelerometer\n");
+        call AccSensorS.stop();
 
             // and classify what we got
             post classify();
