@@ -1,11 +1,10 @@
 /*
- *  Source file for implementation of module tinyBSN, which implements
- *  a Body Sensor Network (BSN) composed of four wireless accelerometers
- *  (two for the wrists, and two for the ankles) and one wireless
- *  ElectroCardioGram (ECG) sensor, mounted on the chest.
- *  The BSN is organized in a star topology, with the ECG sensor acting
- *  as the central node (CN). The CN is also responsible for controlling
- *  the peripheral nodes (PN), by triggering the monitoring process.
+ *  Source file for implementation of module tinyBSN, which implements a Body Sensor Network (BSN)
+ *  composed of four wireless accelerometers (two for the wrists, and two for the ankles) and one
+ *  wireless ElectroCardioGram (ECG) sensor, mounted on the chest.
+ *  The BSN is organized in a star topology, with the ECG sensor acting as the central node (CN).
+ *  The CN is also responsible for controlling the peripheral nodes (PN), by triggering the
+ *  monitoring process.
  *
  *  Code managing the comunications from PNs to the CN's taken from the
  *  module sendAck by Luca Pietro Borsani.
@@ -34,30 +33,48 @@ module tinyBSNC {
 
 } implementation {
 
+
     /*
-     * 
+     * Useful variable for loops
+     */
+    uint8_t i;
+
+    /*
+     * Counter variable
+     * - CN: count responses from PNs
+     * - PN: count the number of samples collected
+     */
+    uint8_t count;
+
+    /*
+     * Counter for  the number of messagges sent
+     */
+    uint8_t msg_count = 0;
+
+    /*
+     * - CN: store in position 0 the application result and in the other positions count the
+     * occurence of the different classifications received from the PNs
+     * - PN: store in position 0 the resulting classification
+     */
+    uint8_t class[4];
+
+    /*
+     * Buffer to store accelerometers' samples
      */
     uint16_t buffer[BUF_SIZE];
 
     /*
-     * A counter used by PNs to keep track of the number of samples collected
-     * and by the CN to count how many classification has received
+     * Array of last sent messages
+     * - CN: for each PN store the last packet sent to it
+     * - PN: in position 0 store the last packet sent to the CN
      */
-    uint8_t count = 0;
-
-    uint8_t classification;
-
-    uint8_t msg_count = 0;
-
-    message_t packet;
+    message_t packets[N_PNS];
 
     task void start();
     task void classify();
     task void sendStart();
     task void sendClass();
     task void evalClass();
-
-    //event void senseResult(uint8_t result);
     
     
     /*
@@ -115,58 +132,77 @@ module tinyBSNC {
         sendStart();
 
      }
+
+
+    /*
+     * This task rescales the samples, calculates the average and classifies the result. At the end
+     * calls sendClass to send the classification to the CN.
+     * Only PNs should call this task.
+     */
     task void classify() {
-        uint8_t i;
+
+        /** Sum of rescaled samples **/ 
         float sum = 0;
+
+        /** Average of rescaled samples **/
         float avg;
 
-        dbg("role", "Rescaling values...\n");
+        dbg("role", "Rescaling samples...\n");
 
         for(i=0; i<BUF_SIZE; i++) {
-            sum += (float)buffer[i]*10/65535; // 2^16-1
             dbg("role_fine", "Scaling [%d]: %d -> %f\n", i, buffer[i], (float)buffer[i]*10/65535);
+            sum += (float)buffer[i]*10/65535; // 2^16-1
         }
 
         dbg("role_fine", "Rescaling finished.\n");
 
         avg = sum/BUF_SIZE;
+
         dbg("role", "Sample average: %f (sum: %f)\n", avg, sum);
 
+        // Classification according to the thresholds
         dbg("role", "Classified as ");
 
         if ( avg < M_THR ) {
-            classification = NO_MOVEMENT;
+            class[0] = NO_MOVEMENT;
             dbg_clear("role", "NO_MOVEMENT (avg < M_THR)\n");
         } else if ( avg > C_THR ) {
-            classification = CRISIS;
+            class[0] = CRISIS;
             dbg_clear("role", "CRISIS (avg > C_THR)\n");
         } else {
-            classification = MOVEMENT;
+            class[0] = MOVEMENT;
             dbg_clear("role", "MOVEMENT (M_THR <= avg <= C_THR)\n");
         }
 
+        // Send the classication to the CN
         post sendClass();
     }
 
-    //***************** Task send classification ********************//
+
+    /*
+     * This task sends the PN's classification to the CN.
+     * Only PNs should call this task.
+     */
     task void sendClass() {
 
-        my_msg_t* mess=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+        my_msg_t* mess=(my_msg_t*)(call Packet.getPayload(&packets[0],sizeof(my_msg_t)));
         mess->msg_type = RES;
         mess->msg_id = msg_count++;
-        mess->value = classification;
+        mess->value = class[0];
 
         dbg("radio_send", "Try to send classification to node 0 at time %s \n", sim_time_string());
 
-        call PacketAcknowledgements.requestAck( &packet );
+        call PacketAcknowledgements.requestAck( &packets[0] );
 
-        if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
+        if(call AMSend.send(0,&packets[0],sizeof(my_msg_t)) == SUCCESS){
 
             dbg("radio_send", "Packet passed to lower layer successfully!\n");
-            dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n", call Packet.payloadLength( &packet ) );
-            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
-            dbg_clear("radio_pack","\t Destination: %hhu \n ", call AMPacket.destination( &packet ) );
-            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
+            dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
+                call Packet.payloadLength(&packets[0]) );
+            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packets[0] ) );
+            dbg_clear("radio_pack","\t Destination: %hhu \n ",
+                call AMPacket.destination(&packets[0]) );
+            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packets[0] ) );
             dbg_clear("radio_pack","\t\t Payload \n" );
             dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", mess->msg_type);
             dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", mess->msg_id);
@@ -177,16 +213,45 @@ module tinyBSNC {
 
     }
 
-    //***************** Task evaluate classifications ********************//
-    task void evalClass() {
-        if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
-            dbg("role", "At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
-            call ECGSensor.read();
-        } else {
-            dbg("role", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
-            post start();
+
+    /*
+     * This task manages the receiving of classifications from the PNs.
+     * Only the CN should call this task.
+     */
+    task void recClass() {
+        class[mess->value]++;
+        count++;
+
+        dbg("role", "Received classification ");
+
+        switch(mess->value){
+            case NO_MOVEMENT:
+                dbg_clear("role", "NO_MOVEMENT");
+                break;
+            case MOVEMENT:
+                dbg_clear("role", "MOVEMENT");
+                break;
+            case CRISIS:
+                dbg_clear("role", "CRISIS");
+                break;
+            default: break;
         }
-    }        
+
+        dbg_clear("role", " from node %d (%d of %d)\n", call AMPacket.source(buf), count, N_PNS);
+
+        if ( count == N_PNS ) {
+            dbg("role", "Last classification received\n");
+
+            if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
+                dbg("role","At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
+                call ECGSensor.read();
+            } else {
+                dbg("role", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
+                post start();
+            }
+        }
+
+    }     
 
     //***************** Boot interface ********************//
     event void Boot.booted() {
@@ -218,19 +283,17 @@ module tinyBSNC {
     event void MilliTimer.fired() {
         dbg("role_fine", "Timer fired! Time to sense!\n");
 
-        if(TOS_NODE_ID != 0) {
-            call AccSensor.read();
-        }
+        call AccSensor.read();
     }                 
 
 
     //********************* AMSend interface ****************//
     event void AMSend.sendDone(message_t* buf,error_t err) {
 
-        if(&packet == buf && err == SUCCESS ) {
+        if( buf == &packets[call AMPacket.destination(buf)] && err == SUCCESS ) {
 
             if ( call AMPacket.destination( buf ) != AM_BROADCAST_ADDR ) {
-                dbg("radio_send", "Packet sent to %d...", call AMPacket.destination( buf ));
+                dbg("radio_send", "Packet sent to %d...", call AMPacket.destination(buf));
 
                 if ( call PacketAcknowledgements.wasAcked( buf ) ) {
                     dbg_clear("radio_ack", "and ack received");
@@ -258,55 +321,29 @@ module tinyBSNC {
         my_msg_t* mess=(my_msg_t*)payload;
 
         dbg("radio_rec","Message received at time %s \n", sim_time_string());
-        dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength( buf ) );
-        dbg_clear("radio_pack","\t Source: %hhu \n", call AMPacket.source( buf ) );
-        dbg_clear("radio_pack","\t Destination: %hhu \n", call AMPacket.destination( buf ) );
-        dbg_clear("radio_pack","\t AM Type: %hhu \n", call AMPacket.type( buf ) );
+        dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
+        dbg_clear("radio_pack","\t Source: %hhu \n", call AMPacket.source(buf) );
+        dbg_clear("radio_pack","\t Destination: %hhu \n", call AMPacket.destination(buf) );
+        dbg_clear("radio_pack","\t AM Type: %hhu \n", call AMPacket.type(buf) );
         dbg_clear("radio_pack","\t\t Payload \n" );
         dbg_clear("radio_pack", "\t\t msg_type: %hhu \n", mess->msg_type);
         dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", mess->msg_id);
         dbg_clear("radio_pack", "\t\t value: %hhu \n", mess->value);
         dbg_clear("radio_pack","\n");
 
-        if ( TOS_NODE_ID != 0 ) {
+        if ( TOS_NODE_ID == 0 ) {
+            post recClass();
+        } else {
 
-            if ( mess->msg_type == REQ && mess->value == START ) {
-
+            if ( !MilliTimer.isRunnning() ) {
                 // Resetting the counter
                 count = 0;
 
-                dbg("role", "Starting timer for acquisition. \n");
+                dbg("role", "Starting timer for acquisition.\n");
                 call MilliTimer.startPeriodic(50); // 20Hz
 
-            }    
-
-        } else {
-            if (mess->msg_type == RES) {
-
-                buffer[mess->value]++;
-                count++;
-
-                dbg("role", "Received classification ");
-
-                switch(mess->value){
-                    case NO_MOVEMENT:
-                    dbg_clear("role", "NO_MOVEMENT");
-                    break;
-                    case MOVEMENT:
-                    dbg_clear("role", "MOVEMENT");
-                    break;
-                    case CRISIS:
-                    dbg_clear("role", "CRISIS");
-                    break;
-                    default: break;
-                }
-
-                dbg_clear("role", " from node %d (%d of %d)\n", call AMPacket.source(buf), count, N_PNS);
-
-                if ( count == N_PNS ) {
-                    dbg("role", "Last classification received\n");
-                    post evalClass();
-                }
+            } else {
+                dbg("role", "Acquisition already started");
             }
         }
 
@@ -338,13 +375,15 @@ module tinyBSNC {
   event void ECGSensor.readDone(error_t result, uint16_t data) {
     if(data == 1) {
         dbg("role", "Heart Rate variation detected ");
-        if (buffer[CRISIS] >= 2) {
+
+        if ( class[CRISIS] >= 2 ) {
             dbg_clear("role", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
         } else {
             dbg_clear("role", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
         }
+
     } else {
-        dbg("role", "No Heart Rate variation detected\n");
+        dbg("role", "No Heart Rate variation detected.\n");
     }
 
     post start();
