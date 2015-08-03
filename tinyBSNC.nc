@@ -74,12 +74,10 @@ module tinyBSNC {
     message_t packet;
 
 
-
     task void start();
     task void classify();
     task void sendStart();
     task void sendClass();
-    task void evalClass();
     
     
     /*
@@ -217,10 +215,10 @@ module tinyBSNC {
 
 
     /*
-     * This task manages the receiving of classifications from the PNs.
-     * Only the CN should call this task.
+     * This function manages the receiving of classifications from the PNs.
+     * Only the CN should call this function.
      */
-    task void recClass() {
+    void recClass(message_t* pack) {
         class[msg->value]++;
         count++;
 
@@ -239,7 +237,7 @@ module tinyBSNC {
             default: break;
         }
 
-        dbg_clear("role", " from node %d (%d of %d)\n", call AMPacket.source(buf), count, N_PNS);
+        dbg_clear("role", " from node %d (%d of %d)\n", call AMPacket.source(pack), count, N_PNS);
 
         if ( count == N_PNS ) {
             dbg("role", "Last classification received\n");
@@ -330,7 +328,7 @@ module tinyBSNC {
     //***************************** Receive interface *****************//
     event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
-        my_msg_t* msg=(my_msg_t*)payload;
+        msg=(my_msg_t*)payload;
 
         dbg("radio_rec","Message received at time %s \n", sim_time_string());
         dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
@@ -344,7 +342,7 @@ module tinyBSNC {
         dbg_clear("radio_pack","\n");
 
         if ( TOS_NODE_ID == 0 ) {
-            post recClass();
+            post recClass(buf);
         } else {
 
             if ( !MilliTimer.isRunnning() ) {
