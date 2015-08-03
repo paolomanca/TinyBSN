@@ -29,6 +29,7 @@ module tinyBSNC {
     	interface Receive;
     	interface Timer<TMilli> as MilliTimer;
 	interface Read<uint16_t> as AccSensor;
+        interface Read<uint16_t> as ECGSensor;
   }
 
 } implementation {
