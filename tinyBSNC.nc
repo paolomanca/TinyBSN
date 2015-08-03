@@ -73,6 +73,11 @@ module tinyBSNC {
 	  dbg_clear("radio_pack", "\n");
       
       }
+
+	buf_count = 0;
+	buffer[NO_MOVEMENT] = 0;
+	buffer[MOVEMENT] = 0;
+	buffer[CRISIS] = 0;
   }
 
   //***************** Task sense from accelerometer *****************//
