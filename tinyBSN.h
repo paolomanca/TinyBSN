@@ -1,5 +1,5 @@
-﻿﻿/**
- *  @author Paolo Manca
+/*
+ * @author Paolo Manca
  */
 
 #ifndef SENDACK_H

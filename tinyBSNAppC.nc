@@ -1,4 +1,4 @@
-/**
+/*
  *  Configuration file for wiring of tinyBSNC module to other common 
  *  components needed for proper functioning
  *
@@ -13,7 +13,6 @@
 configuration tinyBSNAppC {}
 
 implementation {
-
     components MainC, tinyBSNC as App;
     components new AMSenderC(AM_MY_MSG);
     components new AMReceiverC(AM_MY_MSG);

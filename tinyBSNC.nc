@@ -1,4 +1,4 @@
-﻿﻿/**
+/*
  *  Source file for implementation of module tinyBSN, which implements
  *  a Body Sensor Network (BSN) composed of four wireless accelerometers
  *  (two for the wrists, and two for the ankles) and one wireless
