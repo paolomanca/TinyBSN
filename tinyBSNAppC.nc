@@ -18,7 +18,7 @@ implementation {
     components new AMReceiverC(AM_MY_MSG);
     components ActiveMessageC;
     components new TimerMilliC();
-    components new FakeSensorC() as Accelerometer;
+    components new ACCSensorC() as Accelerometer;
     components new FakeSensorC() as ECG;
 
     //Boot interface
@@ -41,6 +41,7 @@ implementation {
 
     //Sensors
     App.AccSensor -> Accelerometer;
+    App.AccSensorS -> Accelerometer;
     App.ECGSensor -> ECG;
 
 }

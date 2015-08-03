@@ -28,6 +28,7 @@ module tinyBSNC {
         interface Receive;
         interface Timer<TMilli> as MilliTimer;
         interface Read<uint16_t> as AccSensor;
+	interface SplitControl as AccSensorS;
         interface Read<uint16_t> as ECGSensor;
     }
 
@@ -122,7 +123,8 @@ module tinyBSNC {
      * Only the CN should call this task.
      */
      task void start() {
-
+	dbg_clear("role_coarse", "\n");
+	dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
         count = 0;
 
         for ( i=0; i<4; i++ ) {
@@ -243,11 +245,11 @@ module tinyBSNC {
             dbg("role", "Last classification received\n");
 
             if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
-                dbg("role","At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
+                dbg("role_coarse","At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
                 call ECGSensor.read();
             } else {
-                dbg("role", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
-                post start();
+                dbg("role_coarse", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
+                //post start();
             }
         }
 
@@ -348,6 +350,8 @@ module tinyBSNC {
             if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the counter
                 count = 0;
+		dbg("role", "Starting accelerometer\n");
+		call AccSensorS.start();
 
                 dbg("role", "Starting timer for acquisition.\n");
                 call MilliTimer.startPeriodic(50); // 20Hz
@@ -374,26 +378,37 @@ module tinyBSNC {
             // Stop the timer to stop getting samples
             call MilliTimer.stop();
 
+	    dbg("role", "Stopping accelerometer\n");
+	    call AccSensorS.stop();
+
             // and classify what we got
             post classify();
         }
 
+    }
+
+    event void AccSensorS.startDone(error_t err) {
+        dbg("role", "Accelerometer started!\n");
+    }
+
+    event void AccSensorS.stopDone(error_t err) {
+        dbg("role", "Accelerometer stopped!\n");
     }
   
 
   //************************* ECG Read interface **********************//
   event void ECGSensor.readDone(error_t result, uint16_t data) {
     if(data == 1) {
-        dbg("role", "Heart Rate variation detected ");
+        dbg("role_coarse", "Heart Rate variation detected ");
 
         if ( class[CRISIS] >= 2 ) {
-            dbg_clear("role", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
+            dbg_clear("role_coarse", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
         } else {
-            dbg_clear("role", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
+            dbg_clear("role_coarse", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
         }
 
     } else {
-        dbg("role", "No Heart Rate variation detected.\n");
+        dbg("role_coarse", "No Heart Rate variation detected.\n");
     }
 
     post start();
