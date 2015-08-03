@@ -134,7 +134,18 @@ module tinyBSNC {
       
       }
 
- }        
+ }
+
+  //***************** Task evaluate classifications ********************//
+  task void evalClass() {
+	if ( buffer[MOVEMENT]+buffer[CRISIS] >= 3 ) {
+		dbg("role", "At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n");
+		call ECGSensor.read();
+	} else {
+		dbg("role", "Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...");
+		post start();
+	}
+  }        
 
   //***************** Boot interface ********************//
   event void Boot.booted() {
