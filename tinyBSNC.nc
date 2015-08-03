@@ -29,8 +29,9 @@ module tinyBSNC {
         interface Timer<TMilli> as MilliTimer;
         interface Timer<TMilli> as Timeout;
         interface Read<uint16_t> as AccSensor;
-    interface SplitControl as AccSensorS;
+        interface SplitControl as AccSensorS;
         interface Read<uint16_t> as ECGSensor;
+        interface SplitControl as ECGSensorS;
     }
 
 } implementation {
@@ -255,7 +256,7 @@ module tinyBSNC {
             call Timeout.stop();
 
             if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
-                dbg("role_coarse","[%s] At least 3 nodes detected MOVEMENT or CRISIS, getting Heart Rate variation from ECG...\n", sim_time_string());
+                dbg("role_coarse", "[%s] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...\n", sim_time_string());
                 call ECGSensor.read();
             } else {
                 dbg("role_coarse", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...\n", sim_time_string());
@@ -424,22 +425,30 @@ module tinyBSNC {
     }
   
 
-  //************************* ECG Read interface **********************//
-  event void ECGSensor.readDone(error_t result, uint16_t data) {    
-    if(data == 1) {
-        dbg("role_coarse", "[%s] Heart Rate variation detected ", sim_time_string());
+    //************************* ECG Read interface **********************//
+    event void ECGSensor.readDone(error_t result, uint16_t data) {    
+        if(data == 1) {
+            dbg("role_coarse", "[%s] Heart Rate variation detected ", sim_time_string());
 
-        if ( class[CRISIS] >= 2 ) {
-            dbg_clear("role_coarse", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
+            if ( class[CRISIS] >= 2 ) {
+                dbg_clear("role_coarse", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
+            } else {
+                dbg_clear("role_coarse", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
+            }
+
         } else {
-            dbg_clear("role_coarse", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
+            dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
         }
 
-    } else {
-        dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
+        post start();
     }
 
-    post start();
-  }
+    event void ECGSensorS.startDone(error_t err) {
+        dbg("role", "[%s] ECG started!\n", sim_time_string());
+    }
+
+    event void ECGSensorS.stopDone(error_t err) {
+        dbg("role", "[%s] ECG stopped!\n", sim_time_string());
+    }
 
 }

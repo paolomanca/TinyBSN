@@ -20,7 +20,7 @@ implementation {
     components new TimerMilliC() as TMilli;
     components new TimerMilliC() as Timeout;
     components new ACCSensorC() as Accelerometer;
-    components new FakeSensorC() as ECG;
+    components new ECGSensorC() as ECG;
 
     //Boot interface
     App.Boot -> MainC.Boot;
@@ -45,5 +45,6 @@ implementation {
     App.AccSensor -> Accelerometer;
     App.AccSensorS -> Accelerometer;
     App.ECGSensor -> ECG;
+    App.ECGSensorS -> ECG;
 
 }
