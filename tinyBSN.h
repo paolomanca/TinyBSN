@@ -7,13 +7,15 @@
 
 #define BUF_SIZE 200
 
+#define N_PNS 4
+
 /** Classification thresholds **/
 #define M_THR 0.5
 #define C_THR 2
 
 /** Message types **/
 #define REQ 1
-#define RESP 2
+#define RES 2
 
 /** Message values **/
 #define START 0
