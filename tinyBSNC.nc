@@ -129,7 +129,7 @@ module tinyBSNC {
             class[i] = 0;
         }
 
-        sendStart();
+        post sendStart();
 
      }
 
@@ -288,7 +288,7 @@ module tinyBSNC {
 
 
     //********************* AMSend interface ****************//
-    event void AMSend.sendDone(msgage_t* buf,error_t err) {
+    event void AMSend.sendDone(message_t* buf,error_t err) {
 
         if( buf == &packet && err == SUCCESS ) {
 
@@ -342,10 +342,10 @@ module tinyBSNC {
         dbg_clear("radio_pack","\n");
 
         if ( TOS_NODE_ID == 0 ) {
-            post recClass(buf);
+            recClass(buf);
         } else {
 
-            if ( !MilliTimer.isRunnning() ) {
+            if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the counter
                 count = 0;
 
