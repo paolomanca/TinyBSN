@@ -64,11 +64,16 @@ module tinyBSNC {
     uint16_t buffer[BUF_SIZE];
 
     /*
-     * Array of last sent messages
-     * - CN: for each PN store the last packet sent to it
-     * - PN: in position 0 store the last packet sent to the CN
+     * Message variable
      */
-    message_t packets[N_PNS];
+    my_msg_t* msg;
+
+    /*
+     * Last sent message
+     */
+    message_t packet;
+
+
 
     task void start();
     task void classify();
@@ -84,34 +89,31 @@ module tinyBSNC {
      */
     task void sendStart() {
 
-        dbg("radio_send", "Broadcasting START command at time %s \n", sim_time_string());
+        // Composing the message
+        msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+        msg->msg_type = REQ;
+        msg->msg_id = msg_count++;
+        msg->value = START;
 
-        for ( i = 0; i<N_PNS; i++ ) {
+        dbg("radio_send", "Trying to send START command to node %d at time %s \n", count+1, sim_time_string());
 
-            // Composing the message
-            my_msg_t* mess=(my_msg_t*)(call Packet.getPayload(&packets[i],sizeof(my_msg_t)));
-            mess->msg_type = REQ;
-            mess->msg_id = msg_count++;
-            mess->value = START;
+        call PacketAcknowledgements.requestAck( &packet );
 
-            call PacketAcknowledgements.requestAck( &packets[i] );
+        if(call AMSend.send(count+1,&packet,sizeof(my_msg_t)) == SUCCESS) {
 
-            if(call AMSend.send(i+1,&packets[i],sizeof(my_msg_t)) == SUCCESS) {
+            dbg("radio_send", "Packet passed to lower layer successfully!\n");
+            dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
+                call Packet.payloadLength(&packet) );
+            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
+            dbg_clear("radio_pack","\t Destination: %hhu \n ",
+                call AMPacket.destination( &packet ) );
+            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
+            dbg_clear("radio_pack","\t\t Payload \n" );
+            dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
+            dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
+            dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
+            dbg_clear("radio_pack", "\n");
 
-                dbg("radio_send", "Packet passed to lower layer successfully!\n");
-                dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
-                    call Packet.payloadLength(&packets[i]) );
-                dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packets[i] ) );
-                dbg_clear("radio_pack","\t Destination: %hhu \n ",
-                    call AMPacket.destination( &packets[i] ) );
-                dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packets[i] ) );
-                dbg_clear("radio_pack","\t\t Payload \n" );
-                dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", mess->msg_type);
-                dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", mess->msg_id);
-                dbg_clear("radio_pack", "\t\t value: %hhu \n", mess->value);
-                dbg_clear("radio_pack", "\n");
-
-            }
         }
 
     }
@@ -185,28 +187,28 @@ module tinyBSNC {
      */
     task void sendClass() {
 
-        my_msg_t* mess=(my_msg_t*)(call Packet.getPayload(&packets[0],sizeof(my_msg_t)));
-        mess->msg_type = RES;
-        mess->msg_id = msg_count++;
-        mess->value = class[0];
+        msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+        msg->msg_type = RES;
+        msg->msg_id = msg_count++;
+        msg->value = class[0];
 
         dbg("radio_send", "Try to send classification to node 0 at time %s \n", sim_time_string());
 
-        call PacketAcknowledgements.requestAck( &packets[0] );
+        call PacketAcknowledgements.requestAck( &packet );
 
-        if(call AMSend.send(0,&packets[0],sizeof(my_msg_t)) == SUCCESS){
+        if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
 
             dbg("radio_send", "Packet passed to lower layer successfully!\n");
             dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
-                call Packet.payloadLength(&packets[0]) );
-            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packets[0] ) );
+                call Packet.payloadLength(&packet) );
+            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
             dbg_clear("radio_pack","\t Destination: %hhu \n ",
-                call AMPacket.destination(&packets[0]) );
-            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packets[0] ) );
+                call AMPacket.destination(&packet) );
+            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
             dbg_clear("radio_pack","\t\t Payload \n" );
-            dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", mess->msg_type);
-            dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", mess->msg_id);
-            dbg_clear("radio_pack", "\t\t value: %hhu \n", mess->value);
+            dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
+            dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
+            dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
             dbg_clear("radio_pack", "\n");
 
         }
@@ -219,12 +221,12 @@ module tinyBSNC {
      * Only the CN should call this task.
      */
     task void recClass() {
-        class[mess->value]++;
+        class[msg->value]++;
         count++;
 
         dbg("role", "Received classification ");
 
-        switch(mess->value){
+        switch(msg->value){
             case NO_MOVEMENT:
                 dbg_clear("role", "NO_MOVEMENT");
                 break;
@@ -288,29 +290,39 @@ module tinyBSNC {
 
 
     //********************* AMSend interface ****************//
-    event void AMSend.sendDone(message_t* buf,error_t err) {
+    event void AMSend.sendDone(msgage_t* buf,error_t err) {
 
-        if( buf == &packets[call AMPacket.destination(buf)] && err == SUCCESS ) {
+        if( buf == &packet && err == SUCCESS ) {
 
-            if ( call AMPacket.destination( buf ) != AM_BROADCAST_ADDR ) {
-                dbg("radio_send", "Packet sent to %d...", call AMPacket.destination(buf));
+            dbg("radio_send", "Packet sent to %d...", call AMPacket.destination(buf));
 
-                if ( call PacketAcknowledgements.wasAcked( buf ) ) {
-                    dbg_clear("radio_ack", "and ack received");
-                } else {
-                    dbg_clear("radio_ack", "but ack was not received");
+            if ( call PacketAcknowledgements.wasAcked(buf) ) {
+                dbg_clear("radio_ack", "and ack received");
 
-                        if ( TOS_NODE_ID == 0 ) {
-                            post sendStart();
-                        } else {
-                            post sendClass();
-                        }
+                if ( TOS_NODE_ID == 0 ) {
+                    // Ack coming from the START command,
+                    count++;
+
+                    // Send to next node (if any)
+                    if ( count < N_PNS) {
+                        post sendStart();
+                    } else {
+                        count = 0;
+                    }
                 }
-                dbg_clear("radio_send", " at time %s \n\n", sim_time_string());
-            } else {
-                dbg("radio_send", "Packet broadcasted at time %s \n", sim_time_string());
-            }
 
+            } else {
+                dbg_clear("radio_ack", "but ack was not received");
+
+                if ( TOS_NODE_ID == 0 ) {
+                    // Ack missing from the START command
+                    post sendStart();
+                } else {
+                    // Ack missing from the classification transmission
+                    post sendClass();
+                }
+            }
+            dbg_clear("radio_send", " at time %s \n\n", sim_time_string());
         }
 
     }
@@ -318,7 +330,7 @@ module tinyBSNC {
     //***************************** Receive interface *****************//
     event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
-        my_msg_t* mess=(my_msg_t*)payload;
+        my_msg_t* msg=(my_msg_t*)payload;
 
         dbg("radio_rec","Message received at time %s \n", sim_time_string());
         dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
@@ -326,9 +338,9 @@ module tinyBSNC {
         dbg_clear("radio_pack","\t Destination: %hhu \n", call AMPacket.destination(buf) );
         dbg_clear("radio_pack","\t AM Type: %hhu \n", call AMPacket.type(buf) );
         dbg_clear("radio_pack","\t\t Payload \n" );
-        dbg_clear("radio_pack", "\t\t msg_type: %hhu \n", mess->msg_type);
-        dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", mess->msg_id);
-        dbg_clear("radio_pack", "\t\t value: %hhu \n", mess->value);
+        dbg_clear("radio_pack", "\t\t msg_type: %hhu \n", msg->msg_type);
+        dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
+        dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
         dbg_clear("radio_pack","\n");
 
         if ( TOS_NODE_ID == 0 ) {
