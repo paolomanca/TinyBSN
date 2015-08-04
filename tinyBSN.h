@@ -29,10 +29,22 @@ typedef nx_struct my_msg {
 		nx_uint8_t value;
 } my_msg_t;
 
-
-
 enum{
 	AM_MY_MSG = 6,
 };
+
+/*
+ * Timers' durations (in ms)
+ */
+
+/** Frequency of PN's acquisitions **/
+#define F_ACQ 50 // 20Hz = 50ms
+
+/** PN max time for acquisition **/
+#define PN_TOUT 15000
+
+/** CN wait from the first received classification before abort **/
+#define CN_TOUT 5000
+
 
 #endif

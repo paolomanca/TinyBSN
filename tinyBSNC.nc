@@ -83,20 +83,38 @@ module tinyBSNC {
 
 
     task void start();
-    task void classify();
     task void sendStart();
+    task void classify();
     task void sendClass();
     
-    
+
     /*
-     * This task send the command START to each PN. It sends individual messages instead of
-     * broadcasting to get acknowledges. In case of no ack, it can be called again.
+     * This task starts the acquisition process.
+     * Only the CN should call this task.
+     */
+     task void start() {
+        dbg_clear("role_coarse", "\n");
+        dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
+        count = 0;
+
+        for ( i=0; i<4; i++ ) {
+            class[i] = 0;
+        }
+
+        post sendStart();
+
+     }
+    
+
+    /*
+     * This task sends the command START to each PN. Individual messages are sent instead of
+     * broadcasting one to get acknowledges. In case of no ack, it can be called again.
      * Only the CN should call this task.
      */
     task void sendStart() {
 
         // Composing the message
-        msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+        msg = (my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
         msg->msg_type = REQ;
         msg->msg_id = msg_count++;
         msg->value = START;
@@ -123,24 +141,6 @@ module tinyBSNC {
         }
 
     }
-
-
-    /*
-     * This task starts the acquisition process.
-     * Only the CN should call this task.
-     */
-     task void start() {
-        dbg_clear("role_coarse", "\n");
-        dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
-        count = 0;
-
-        for ( i=0; i<4; i++ ) {
-            class[i] = 0;
-        }
-
-        post sendStart();
-
-     }
 
 
     /*
@@ -195,7 +195,7 @@ module tinyBSNC {
     task void sendClass() {
 
 	    if ( call Timeout.isRunning() == TRUE ) {
-            msg=(my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+            msg = (my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
             msg->msg_type = RES;
             msg->msg_id = msg_count++;
             msg->value = class[0];
@@ -236,7 +236,7 @@ module tinyBSNC {
         count++;
 
         if ( call Timeout.isRunning() == FALSE ) {
-            call Timeout.startOneShot(15000);
+            call Timeout.startOneShot(CN_TOUT);
         }
 
         dbg("role_coarse", "[%s] Received classification ", sim_time_string());
@@ -268,26 +268,41 @@ module tinyBSNC {
 
     }     
 
-    //***************** Boot interface ********************//
+
+    /*
+     * BOOT INTERFACE
+     */
     event void Boot.booted() {
         dbg("boot","[%s] Application booted.\n", sim_time_string());
+
+        // Starting the radio
         call SplitControl.start();
+
+        // Starting the sensor
+        if ( TOS_NODE_ID == 0 ) {
+            call ECGSensorS.start();
+        } else {
+            call AccSensorS.start();
+        }
     }
 
-    //***************** SplitControl interface ********************//
+
+    /*
+     * RADIO
+     *
+     * This event is received when the radio is started.
+     * - CN: trigger the starting procedure of the acquisition
+     * - PN: 
+     */
     event void SplitControl.startDone(error_t err){
 
         if(err == SUCCESS) {
 
-            dbg("radio","[%s] Radio on!\n", sim_time_string());
+            dbg("radio","[%s] Radio started!\n", sim_time_string());
 
             if ( TOS_NODE_ID == 0 ) {
                 post start();
-            } else {
-                dbg("role", "[%s] Starting accelerometer\n", sim_time_string());
-
-                call AccSensorS.start();
-	    }
+            }
 
         } else {
             call SplitControl.start();
@@ -295,27 +310,16 @@ module tinyBSNC {
 
     }
 
-    event void SplitControl.stopDone(error_t err){}
-
-
-    //***************** MilliTimer interface ********************//
-    event void MilliTimer.fired() {
-        dbg("role_fine", "[%s] Timer fired! Time to sense!\n", sim_time_string());
-        call AccSensor.read();
-    }                 
-
-    event void Timeout.fired() {
-        timeouts++;
-        if ( TOS_NODE_ID == 0 ) {
-            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeout);
-
-            post start();
-        } else {
-            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeout);
-        }
+    event void SplitControl.stopDone(error_t err){
+        dbg("radio", "[%s] Radio stopped!\n", sim_time_string());
     }
 
-    //********************* AMSend interface ****************//
+    /*
+     * This event is received when a packet has been sent. Check for acks and eventually trigger new
+     * transmissions
+     * - CN: deal with START transmission
+     * - PN: deal with classification transmission
+     */
     event void AMSend.sendDone(message_t* buf,error_t err) {
 
         if( buf == &packet && err == SUCCESS ) {
@@ -326,16 +330,20 @@ module tinyBSNC {
                 dbg_clear("radio_ack", "and ack received");
 
                 if ( TOS_NODE_ID == 0 ) {
-                    // Ack coming from the START command,
+                    // START command ackwnoledged
+
+                    // Increase the counter to move to the next PN
                     count++;
 
-                    // Send to next node (if any)
                     if ( count < N_PNS) {
+                        // Send to next PN (if any)
                         post sendStart();
                     } else {
+                        // or reset the counter for the next acquisition
                         count = 0;
                     }
                 } else {
+                    // Classification send ackwnoledged
                     call Timeout.stop();
                 }
 
@@ -343,10 +351,14 @@ module tinyBSNC {
                 dbg_clear("radio_ack", "but ack was not received");
 
                 if ( TOS_NODE_ID == 0 ) {
-                    // Ack missing from the START command
+                    // START command NOT ackwnoledged
+
+                    // Resend to same PN
                     post sendStart();
                 } else {
-                    // Ack missing from the classification transmission
+                    // Classification send NOT ackwnoledged
+
+                    // Resend classification to CN
                     post sendClass();
                 }
             }
@@ -354,10 +366,12 @@ module tinyBSNC {
 
     }
 
-    //***************************** Receive interface *****************//
+    /*
+     * This is event is received when a packet is received.
+     */
     event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
-        msg=(my_msg_t*)payload;
+        msg = (my_msg_t*) payload;
 
         dbg("radio_rec","[%s] Message received.", sim_time_string());
         dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
@@ -371,19 +385,23 @@ module tinyBSNC {
         dbg_clear("radio_pack","\n");
 
         if ( TOS_NODE_ID == 0 ) {
+            // Received classification from a PN
+
             recClass(buf);
         } else {
+            // Received START command from the CN
+
             dbg("role", "[%s] Starting acquisition.\n", sim_time_string());
 
             if ( call MilliTimer.isRunning() == FALSE ) {
-                // Resetting the counter
+                // Resetting the samples counter
                 count = 0;
 
-                dbg("role_fine", "[%s] Starting timer for acquisition.\n", sim_time_string());
-                call MilliTimer.startPeriodic(50); // 20Hz = 50ms
+                dbg("role_fine", "[%s] Starting frequency for acquisition.\n", sim_time_string());
+                call MilliTimer.startPeriodic(FN_ACQ);
 
                 dbg("role_fine", "[%s] Starting timer for timeout.\n", sim_time_string());
-                call Timeout.startOneShot(15000);
+                call Timeout.startOneShot(PN_TOUT);
 
             } else {
                 dbg("role", "[%s] Acquisition already started!\n", sim_time_string());
@@ -394,7 +412,14 @@ module tinyBSNC {
 
     }
   
-    //************************* Accelerometer Read interface **********************//
+
+
+    /*
+     * ACCELEROMETER (PNs)
+     *
+     * This event is received when the read from the accelerometer is complete. It stores the data
+     * in the buffer and, if it is full, calls the classification procedure.
+     */
     event void AccSensor.readDone(error_t result, uint16_t data) {
 
         if ( count < BUF_SIZE ) {
@@ -402,13 +427,10 @@ module tinyBSNC {
             buffer[count] = data;
             count++;
         } else {
-            dbg("role", "[%s] Buffer full!\n", sim_time_string());
+            dbg("role", "[%s] Buffer full! Stopping the acquisition...\n", sim_time_string());
 
             // Stop the timer to stop getting samples
             call MilliTimer.stop();
-
-        dbg("role", "[%s] Stopping accelerometer\n", sim_time_string());
-        call AccSensorS.stop();
 
             // and classify what we got
             post classify();
@@ -417,7 +439,11 @@ module tinyBSNC {
     }
 
     event void AccSensorS.startDone(error_t err) {
-        dbg("role", "[%s] Accelerometer started!\n", sim_time_string());
+        if ( err == SUCCESS ) {
+            dbg("role", "[%s] Accelerometer started!\n", sim_time_string());
+        } else {
+            AccSensorS.start();
+        }
     }
 
     event void AccSensorS.stopDone(error_t err) {
@@ -425,7 +451,13 @@ module tinyBSNC {
     }
   
 
-    //************************* ECG Read interface **********************//
+    /*
+     * ECG (CN)
+     *
+     * This event is received when the read from the ECG is complete. It first analyzes the
+     * the accelerometers' classifications and, if needed, combines its data with them to determine
+     * the application output. Finally, it calls for another acquisition.
+     */
     event void ECGSensor.readDone(error_t result, uint16_t data) {
 
         if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
@@ -457,11 +489,45 @@ module tinyBSNC {
     }
 
     event void ECGSensorS.startDone(error_t err) {
-        dbg("role", "[%s] ECG started!\n", sim_time_string());
+        if ( err == SUCCESS ) {
+            dbg("role", "[%s] ECG started!\n", sim_time_string());
+        } else {
+            ECGSensorS.start();
+        }
     }
 
     event void ECGSensorS.stopDone(error_t err) {
         dbg("role", "[%s] ECG stopped!\n", sim_time_string());
+    }
+
+    
+    /*
+     * FREQUENCY TIMER (PN)
+     *
+     * This timer is fired periodically to signal when it's time to get new samples from the accelerometer
+     */
+    event void MilliTimer.fired() {
+        dbg("role_fine", "[%s] Timer fired: reading from the accelerometer...\n", sim_time_string());
+        call AccSensor.read();
+    }                 
+
+
+    /*
+     * TIMEOUT TIMER (CN & PN)
+     *
+     * - CN: too much time's passed waiting classification results from PNs, starting from the moment
+     * the first one was received
+     * - PN: too much time spent for this acquisition since its start
+     */
+    event void Timeout.fired() {
+        timeouts++;
+        if ( TOS_NODE_ID == 0 ) {
+            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeout);
+
+            post start();
+        } else {
+            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeout);
+        }
     }
 
 }
