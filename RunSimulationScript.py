@@ -38,20 +38,26 @@ print "Activate debug message on channel init"
 t.addChannel("init",out);
 print "Activate debug message on channel boot"
 t.addChannel("boot",out);
-print "Activate debug message on channel radio"
-t.addChannel("radio",out);
-print "Activate debug message on channel radio_send"
-t.addChannel("radio_send",out);
-print "Activate debug message on channel radio_ack"
-t.addChannel("radio_ack",out);
-print "Activate debug message on channel radio_rec"
-t.addChannel("radio_rec",out);
+#print "Activate debug message on channel radio"
+#t.addChannel("radio",out);
+#print "Activate debug message on channel radio_send"
+#t.addChannel("radio_send",out);
+#print "Activate debug message on channel radio_ack"
+#t.addChannel("radio_ack",out);
+#print "Activate debug message on channel radio_rec"
+#t.addChannel("radio_rec",out);
 #print "Activate debug message on channel radio_pack"
 #t.addChannel("radio_pack",out);
-print "Activate debug message on channel role"
-t.addChannel("role",out);
-print "Activate debug message on channel role_fine"
-t.addChannel("role_fine",out);
+#print "Activate debug message on channel role"
+#t.addChannel("role",out);
+#print "Activate debug message on channel role_fine"
+#t.addChannel("role_fine",out);
+print "Activate debug message on channel role_coarse"
+t.addChannel("role_coarse",out);
+print "Activate debug message on channel app_out"
+t.addChannel("app_out",out);
+
+print "\n"
 
 for i in range(0,5):
 	print "Creating node %d ..." % (i);
@@ -60,6 +66,7 @@ for i in range(0,5):
 	node1.bootAtTime(time1);
 	print ">>>Will boot at time",  time1/t.ticksPerSecond(), "[sec]";
 
+print "\n"
 
 print "Creating radio channels..."
 f = open(topofile, "r");
@@ -70,6 +77,7 @@ for line in lines:
     print ">>>Setting radio channel from node ", s[0], " to node ", s[1], " with gain ", s[2], " dBm"
     radio.add(int(s[0]), int(s[1]), float(s[2]))
 
+print "\n"
 
 #Creazione del modello di canale
 print "Initializing Closest Pattern Matching (CPM)...";
@@ -98,10 +106,12 @@ for i in range(0,5):
     print ">>>Creating noise model for node:",i;
     t.getNode(i).createNoiseModel()
 
-print "Start simulation with TOSSIM! \n\n\n";
+print "\n"
 
-for i in range(0,15000):
-	t.runNextEvent()
-	
+print "Start simulation with TOSSIM! \n\n";
+
+while t.time() <= 130*t.ticksPerSecond():
+    t.runNextEvent()
+
 print "\n\nSimulation finished!";
 
