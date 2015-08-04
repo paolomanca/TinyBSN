@@ -216,6 +216,8 @@ module tinyBSNC {
                 dbg_clear("radio_pack", "\n");
 
             }
+        } else {
+            dbg("role", "[%s] Can't send classification, time is out.", sim_time_string());
         }
 
     }
@@ -255,13 +257,7 @@ module tinyBSNC {
 
             call Timeout.stop();
 
-            if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
-                dbg("role_coarse", "[%s] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...\n", sim_time_string());
-                call ECGSensor.read();
-            } else {
-                dbg("role_coarse", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, calling for another acquisition...\n", sim_time_string());
-                post start();
-            }
+            call ECGSensor.read();
         } else {
             dbg_clear("role", "\n");
         }
@@ -373,14 +369,14 @@ module tinyBSNC {
         if ( TOS_NODE_ID == 0 ) {
             recClass(buf);
         } else {
-            dbg("role_coarse", "[%s] Starting acquisition.\n", sim_time_string());
+            dbg("role", "[%s] Starting acquisition.\n", sim_time_string());
 
             if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the counter
                 count = 0;
 
                 dbg("role_fine", "[%s] Starting timer for acquisition.\n", sim_time_string());
-                call MilliTimer.startPeriodic(50); // 20Hz
+                call MilliTimer.startPeriodic(50); // 20Hz = 50ms
 
                 dbg("role_fine", "[%s] Starting timer for timeout.\n", sim_time_string());
                 call Timeout.startOneShot(15000);
@@ -426,19 +422,32 @@ module tinyBSNC {
   
 
     //************************* ECG Read interface **********************//
-    event void ECGSensor.readDone(error_t result, uint16_t data) {    
-        if(data == 1) {
-            dbg("role_coarse", "[%s] Heart Rate variation detected ", sim_time_string());
+    event void ECGSensor.readDone(error_t result, uint16_t data) {
 
-            if ( class[CRISIS] >= 2 ) {
-                dbg_clear("role_coarse", "and at least two nodes detected CRISIS: it's a CRISIS, sending an ALARM!\n");
+        if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
+            dbg("role_coarse", "[%s] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...\n", sim_time_string());
+
+            if(data == 1) {
+                dbg("role_coarse", "[%s] Heart Rate variation detected ", sim_time_string());
+
+                if ( class[CRISIS] >= 2 ) {
+                    dbg_clear("role_coarse", "and at least two nodes detected CRISIS.\n");
+                    dbg("app_out", "[%s] Application output: ALARM!\n", sim_time_string());
+                } else {
+                    dbg_clear("role_coarse", "but less than two nodes detected CRISIS.\n");
+                    dbg("app_out", "[%s] Application output: MOVEMENT.\n", sim_time_string());
+                }
+
             } else {
-                dbg_clear("role_coarse", "but less than two nodes detected CRISIS: just MOVEMENT.\n");
+                dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
+                dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
             }
 
         } else {
-            dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
-        }
+            dbg("role_coarse", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.\n", sim_time_string());
+            dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
+        }    
+
 
         post start();
     }
