@@ -398,7 +398,7 @@ module tinyBSNC {
                 count = 0;
 
                 dbg("role_fine", "[%s] Starting frequency for acquisition.\n", sim_time_string());
-                call MilliTimer.startPeriodic(FN_ACQ);
+                call MilliTimer.startPeriodic(F_ACQ);
 
                 dbg("role_fine", "[%s] Starting timer for timeout.\n", sim_time_string());
                 call Timeout.startOneShot(PN_TOUT);
@@ -442,7 +442,7 @@ module tinyBSNC {
         if ( err == SUCCESS ) {
             dbg("role", "[%s] Accelerometer started!\n", sim_time_string());
         } else {
-            AccSensorS.start();
+            call AccSensorS.start();
         }
     }
 
@@ -492,7 +492,7 @@ module tinyBSNC {
         if ( err == SUCCESS ) {
             dbg("role", "[%s] ECG started!\n", sim_time_string());
         } else {
-            ECGSensorS.start();
+            call ECGSensorS.start();
         }
     }
 
@@ -522,11 +522,11 @@ module tinyBSNC {
     event void Timeout.fired() {
         timeouts++;
         if ( TOS_NODE_ID == 0 ) {
-            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeout);
+            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeouts);
 
             post start();
         } else {
-            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeout);
+            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeouts);
         }
     }
 
