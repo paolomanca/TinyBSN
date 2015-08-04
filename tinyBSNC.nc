@@ -41,7 +41,11 @@ module tinyBSNC {
      * Useful variable for loops
      */
     uint8_t i;
-    uint8_t timeout = 0;
+
+    /*
+     * Counter for the number of timeouts (useful for debug purposes)
+     */
+    uint8_t timeouts = 0;
 
     /*
      * Counter variable
@@ -301,7 +305,7 @@ module tinyBSNC {
     }                 
 
     event void Timeout.fired() {
-        timeout++;
+        timeouts++;
         if ( TOS_NODE_ID == 0 ) {
             dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeout);
 
