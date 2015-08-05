@@ -37,27 +37,15 @@ t.init();
 #out = open(simulation_outfile, "w");
 out = sys.stdout;
 
-#Add debug channel
-#print "Activate debug message on channel init"
-#t.addChannel("init",out);
-#print "Activate debug message on channel boot"
-#t.addChannel("boot",out);
-#print "Activate debug message on channel radio"
-#t.addChannel("radio",out);
-#print "Activate debug message on channel radio_send"
-#t.addChannel("radio_send",out);
-#print "Activate debug message on channel radio_ack"
-#t.addChannel("radio_ack",out);
-#print "Activate debug message on channel radio_rec"
-#t.addChannel("radio_rec",out);
-#print "Activate debug message on channel radio_pack"
-#t.addChannel("radio_pack",out);
-#print "Activate debug message on channel role"
-#t.addChannel("role",out);
-#print "Activate debug message on channel role_fine"
-#t.addChannel("role_fine",out);
-#print "Activate debug message on channel role_coarse"
-#t.addChannel("role_coarse",out);
+
+#print "Activate debug message on channel verbose"
+#t.addChannel("verbose", out);
+print "Activate debug message on channel info"
+t.addChannel("info", out);
+print "Activate debug message on channel main"
+t.addChannel("main", out);
+print "Activate debug message on channel warn"
+t.addChannel("warn", out);
 print "Activate debug message on channel app_out"
 t.addChannel("app_out",out);
 

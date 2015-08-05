@@ -96,8 +96,8 @@ module tinyBSNC {
      * Only the CN should call this task.
      */
      task void start() {
-        dbg_clear("role_coarse", "\n");
-        dbg("role_coarse", "[%s] New acquisition started!\n", sim_time_string());
+        dbg_clear("main", "\n");
+        dbg("main", "[%s] Starting a new acquisition!\n", sim_time_string());
         count = 0;
 
         for ( i=0; i<4; i++ ) {
@@ -122,25 +122,12 @@ module tinyBSNC {
         msg->msg_id = msg_count++;
         msg->value = START;
 
-        dbg("radio_send", "[%s] Trying to send START command to node %d.\n", sim_time_string(), count+1);
+        dbg("main", "[%s] Sending START command to node %d.\n", sim_time_string(), count+1);
 
         call PacketAcknowledgements.requestAck( &packet );
 
         if(call AMSend.send(count+1,&packet,sizeof(bsn_msg_t)) == SUCCESS) {
-
-            dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
-            dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
-                call Packet.payloadLength(&packet) );
-            dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
-            dbg_clear("radio_pack","\t Destination: %hhu \n ",
-                call AMPacket.destination( &packet ) );
-            dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
-            dbg_clear("radio_pack","\t\t Payload \n" );
-            dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
-            dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
-            dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
-            dbg_clear("radio_pack", "\n");
-
+            dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
         }
 
     }
@@ -159,32 +146,34 @@ module tinyBSNC {
         /** Average of rescaled samples **/
         float avg;
 
-        dbg("role", "[%s] Rescaling samples...\n", sim_time_string());
+        dbg("info", "[%s] Rescaling samples...\n", sim_time_string());
 
         for(i=0; i<BUF_SIZE; i++) {
-            dbg("role_fine", "Scaling [%d]: %d -> %f\n", i, buffer[i], (float)buffer[i]*10/65535);
+            dbg("verbose", "Scaling [%d]: %d -> %f\n", i, buffer[i], (float)buffer[i]*10/65535);
             sum += (float)buffer[i]*10/65535; // 2^16-1
         }
 
-        dbg("role_fine", "[%s] Rescaling finished.\n", sim_time_string());
+        dbg("verbose", "[%s] Rescaling finished.\n", sim_time_string());
 
         avg = sum/BUF_SIZE;
 
-        dbg("role", "[%s] Sample average: %f (sum: %f)\n", sim_time_string(), avg, sum);
+        dbg("info", "[%s] Sample average: %f \n", sim_time_string(), avg);
 
         // Classification according to the thresholds
-        dbg("role", "[%s] Classified as ", sim_time_string());
+        dbg("main", "[%s] Classified as ", sim_time_string());
 
         if ( avg < M_THR ) {
             class[0] = NO_MOVEMENT;
-            dbg_clear("role", "NO_MOVEMENT (avg < M_THR)\n");
+            dbg_clear("main", "NO_MOVEMENT (avg < M_THR)");
         } else if ( avg > C_THR ) {
             class[0] = CRISIS;
-            dbg_clear("role", "CRISIS (avg > C_THR)\n");
+            dbg_clear("main", "CRISIS (avg > C_THR)");
         } else {
             class[0] = MOVEMENT;
-            dbg_clear("role", "MOVEMENT (M_THR <= avg <= C_THR)\n");
+            dbg_clear("main", "MOVEMENT (M_THR <= avg <= C_THR)");
         }
+
+        dbg_clear("main", " [M_THR = %f; C_THR = %f]\n", M_THR, C_THR);
 
         // Send the classication to the CN
         post sendClass();
@@ -203,28 +192,15 @@ module tinyBSNC {
             msg->msg_id = msg_count++;
             msg->value = class[0];
 
-            dbg("radio_send", "[%s] Trying to send classification to node 0.\n", sim_time_string());
+            dbg("main", "[%s] Sending classification to node 0.\n", sim_time_string());
 
             call PacketAcknowledgements.requestAck( &packet );
 
             if(call AMSend.send(0,&packet,sizeof(bsn_msg_t)) == SUCCESS){
-
-                dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
-                dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
-                    call Packet.payloadLength(&packet) );
-                dbg_clear("radio_pack","\t Source: %hhu \n ", call AMPacket.source( &packet ) );
-                dbg_clear("radio_pack","\t Destination: %hhu \n ",
-                    call AMPacket.destination(&packet) );
-                dbg_clear("radio_pack","\t AM Type: %hhu \n ", call AMPacket.type( &packet ) );
-                dbg_clear("radio_pack","\t\t Payload \n" );
-                dbg_clear("radio_pack", "\t\t msg_type: %hhu \n ", msg->msg_type);
-                dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
-                dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
-                dbg_clear("radio_pack", "\n");
-
+                dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
             }
         } else {
-            dbg("role", "[%s] Can't send classification, time is out.", sim_time_string());
+            dbg("warn", "[%s] Can't send classification, time is out.", sim_time_string());
         }
 
     }
@@ -240,31 +216,27 @@ module tinyBSNC {
             class[msg->value]++;
             count++;
 
-            dbg("role_coarse", "[%s] Received classification ", sim_time_string());
+            dbg("main", "[%s] Received classification ", sim_time_string());
 
             switch(msg->value){
                 case NO_MOVEMENT:
-                    dbg_clear("role_coarse", "NO_MOVEMENT");
+                    dbg_clear("main", "NO_MOVEMENT");
                     break;
                 case MOVEMENT:
-                    dbg_clear("role_coarse", "MOVEMENT");
+                    dbg_clear("main", "MOVEMENT");
                     break;
                 case CRISIS:
-                    dbg_clear("role_coarse", "CRISIS");
+                    dbg_clear("main", "CRISIS");
                     break;
                 default: break;
             }
 
-            dbg_clear("role_coarse", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
+            dbg_clear("main", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
 
             if ( count == N_PNS ) {
-                dbg("role", " Last classification received!\n");
-
                 call Timeout.stop();
 
                 call ECGSensor.read();
-            } else {
-                dbg_clear("role", "\n");
             }
 
         }
@@ -283,10 +255,10 @@ module tinyBSNC {
         //msg->msg_id = msg_count++;
         msg_s->sample_value = class[0];
 
-        dbg("radio_send", "[%s] Trying to send application output on the serial port.\n", sim_time_string());
+        dbg("main", "[%s] Sending application output on the serial port.\n", sim_time_string());
 
         if(call SerialSend.send(AM_BROADCAST_ADDR,&packet,sizeof(test_serial_msg_t)) == SUCCESS) {
-            dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
+            dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
         }
 
     }
@@ -296,7 +268,7 @@ module tinyBSNC {
      * BOOT INTERFACE
      */
     event void Boot.booted() {
-        dbg("boot","[%s] Application booted.\n", sim_time_string());
+        dbg("info","[%s] Application booted.\n", sim_time_string());
 
         // Starting the radio
         call Radio.start();
@@ -322,7 +294,7 @@ module tinyBSNC {
 
         if(err == SUCCESS) {
 
-            dbg("radio","[%s] Radio started!\n", sim_time_string());
+            dbg("info","[%s] Radio started!\n", sim_time_string());
 
             if ( TOS_NODE_ID == 0 ) {
                 post start();
@@ -335,7 +307,7 @@ module tinyBSNC {
     }
 
     event void Radio.stopDone(error_t err){
-        dbg("radio", "[%s] Radio stopped!\n", sim_time_string());
+        dbg("info", "[%s] Radio stopped!\n", sim_time_string());
     }
 
     /*
@@ -348,10 +320,10 @@ module tinyBSNC {
 
         if( buf == &packet && err == SUCCESS ) {
 
-            dbg("radio_send", "[%s] Packet sent to %d...", sim_time_string(), call AMPacket.destination(buf));
+            dbg("info", "[%s] Packet sent to %d...", sim_time_string(), call AMPacket.destination(buf));
 
             if ( call PacketAcknowledgements.wasAcked(buf) ) {
-                dbg_clear("radio_ack", "and ack received.\n");
+                dbg_clear("info", "and ack received.\n");
 
                 if ( TOS_NODE_ID == 0 ) {
                     // START command ackwnoledged
@@ -372,7 +344,7 @@ module tinyBSNC {
                 }
 
             } else {
-                dbg_clear("radio_ack", "but ack was not received.\n");
+                dbg_clear("info", "but ack was not received.\n");
 
                 if ( TOS_NODE_ID == 0 ) {
                     // START command NOT ackwnoledged
@@ -397,16 +369,7 @@ module tinyBSNC {
 
         msg = (bsn_msg_t*) payload;
 
-        dbg("radio_rec","[%s] Message received.\n", sim_time_string());
-        dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
-        dbg_clear("radio_pack","\t Source: %hhu \n", call AMPacket.source(buf) );
-        dbg_clear("radio_pack","\t Destination: %hhu \n", call AMPacket.destination(buf) );
-        dbg_clear("radio_pack","\t AM Type: %hhu \n", call AMPacket.type(buf) );
-        dbg_clear("radio_pack","\t\t Payload \n" );
-        dbg_clear("radio_pack", "\t\t msg_type: %hhu \n", msg->msg_type);
-        dbg_clear("radio_pack", "\t\t msg_id: %hhu \n", msg->msg_id);
-        dbg_clear("radio_pack", "\t\t value: %hhu \n", msg->value);
-        dbg_clear("radio_pack","\n");
+        dbg("info","[%s] Message received.\n", sim_time_string());
 
         if ( TOS_NODE_ID == 0 ) {
             // Received classification from a PN
@@ -419,20 +382,20 @@ module tinyBSNC {
         } else {
             // Received START command from the CN
 
-            dbg("role", "[%s] Starting acquisition.\n", sim_time_string());
+            dbg("main", "[%s] Starting acquisition.\n", sim_time_string());
 
             if ( call MilliTimer.isRunning() == FALSE ) {
                 // Resetting the samples counter
                 count = 0;
 
-                dbg("role_fine", "[%s] Starting frequency for acquisition.\n", sim_time_string());
+                dbg("verbose", "[%s] Starting frequency for acquisition.\n", sim_time_string());
                 call MilliTimer.startPeriodic(F_ACQ);
 
-                dbg("role_fine", "[%s] Starting timer for timeout.\n", sim_time_string());
+                dbg("verbose", "[%s] Starting timer for timeout.\n", sim_time_string());
                 call Timeout.startOneShot(PN_TOUT);
 
             } else {
-                dbg("role", "[%s] Acquisition already started!\n", sim_time_string());
+                dbg("warn", "[%s] Acquisition already started!\n", sim_time_string());
             }
         }
 
@@ -454,7 +417,7 @@ module tinyBSNC {
     event void SerialSend.sendDone(message_t* buf,error_t err) {
 
         if( err == SUCCESS ) {
-            dbg("radio_send", "[%s] Serial packet sent.\n", sim_time_string());
+            dbg("info", "[%s] Serial packet sent.\n", sim_time_string());
         }
     }
 
@@ -468,11 +431,11 @@ module tinyBSNC {
     event void AccSensor.readDone(error_t result, uint16_t data) {
 
         if ( count < BUF_SIZE ) {
-            dbg("role_fine", "[%s] Sensed new data from accelerometer. Storing value %d in buffer at position %d\n", sim_time_string(), data, count);
+            dbg("verbose", "[%s] Sensed new data from accelerometer. Storing value %d in buffer at position %d\n", sim_time_string(), data, count);
             buffer[count] = data;
             count++;
         } else {
-            dbg("role", "[%s] Buffer full! Stopping the acquisition...\n", sim_time_string());
+            dbg("main", "[%s] Buffer full! Stopping the acquisition...\n", sim_time_string());
 
             // Stop the timer to stop getting samples
             call MilliTimer.stop();
@@ -485,14 +448,14 @@ module tinyBSNC {
 
     event void AccSensorS.startDone(error_t err) {
         if ( err == SUCCESS ) {
-            dbg("role", "[%s] Accelerometer started!\n", sim_time_string());
+            dbg("info", "[%s] Accelerometer started!\n", sim_time_string());
         } else {
             call AccSensorS.start();
         }
     }
 
     event void AccSensorS.stopDone(error_t err) {
-        dbg("role", "[%s] Accelerometer stopped!\n", sim_time_string());
+        dbg("info", "[%s] Accelerometer stopped!\n", sim_time_string());
     }
   
 
@@ -506,29 +469,29 @@ module tinyBSNC {
     event void ECGSensor.readDone(error_t result, uint16_t data) {
 
         if ( class[MOVEMENT]+class[CRISIS] >= 3 ) {
-            dbg("role_coarse", "[%s] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...\n", sim_time_string());
+            dbg("main", "[%s] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...\n", sim_time_string());
 
             if(data == 1) {
-                dbg("role_coarse", "[%s] Heart Rate variation detected ", sim_time_string());
+                dbg("main", "[%s] Heart Rate variation detected ", sim_time_string());
 
                 if ( class[CRISIS] >= 2 ) {
-                    dbg_clear("role_coarse", "and at least two nodes detected CRISIS.\n");
+                    dbg_clear("main", "and at least two nodes detected CRISIS.\n");
                     dbg("app_out", "[%s] Application output: ALARM!\n", sim_time_string());
                     class[0] = CRISIS;
                 } else {
-                    dbg_clear("role_coarse", "but less than two nodes detected CRISIS.\n");
+                    dbg_clear("main", "but less than two nodes detected CRISIS.\n");
                     dbg("app_out", "[%s] Application output: MOVEMENT.\n", sim_time_string());
                     class[0] = MOVEMENT;
                 }
 
             } else {
-                dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
+                dbg("main", "[%s] No Heart Rate variation detected.\n", sim_time_string());
                 dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
                 class[0] = NO_MOVEMENT;
             }
 
         } else {
-            dbg("role_coarse", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.\n", sim_time_string());
+            dbg("main", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.\n", sim_time_string());
             dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
             class[0] = NO_MOVEMENT;
         }    
@@ -539,14 +502,14 @@ module tinyBSNC {
 
     event void ECGSensorS.startDone(error_t err) {
         if ( err == SUCCESS ) {
-            dbg("role", "[%s] ECG started!\n", sim_time_string());
+            dbg("info", "[%s] ECG started!\n", sim_time_string());
         } else {
             call ECGSensorS.start();
         }
     }
 
     event void ECGSensorS.stopDone(error_t err) {
-        dbg("role", "[%s] ECG stopped!\n", sim_time_string());
+        dbg("info", "[%s] ECG stopped!\n", sim_time_string());
     }
 
     
@@ -556,7 +519,7 @@ module tinyBSNC {
      * This timer is fired periodically to signal when it's time to get new samples from the accelerometer
      */
     event void MilliTimer.fired() {
-        dbg("role_fine", "[%s] Timer fired: reading from the accelerometer...\n", sim_time_string());
+        dbg("verbose", "[%s] Timer fired: reading from the accelerometer...\n", sim_time_string());
         call AccSensor.read();
     }                 
 
@@ -571,11 +534,11 @@ module tinyBSNC {
     event void Timeout.fired() {
         timeouts++;
         if ( TOS_NODE_ID == 0 ) {
-            dbg("role_coarse", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeouts);
+            dbg("warn", "[%s] Timeout (%d): at least one node failed to deliver in time. Calling another acquisition.\n", sim_time_string(), timeouts);
 
             post start();
         } else {
-            dbg("role", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeouts);
+            dbg("warn", "[%s] Timeout (%d): missed the acquisition, will wait for the next one.\n", sim_time_string(), timeouts);
         }
     }
 
