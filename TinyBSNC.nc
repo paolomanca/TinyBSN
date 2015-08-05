@@ -97,6 +97,8 @@ module TinyBSNC {
         dbg("main", "[%s] Starting a new acquisition!\n", sim_time_string());
         count = 0;
 
+        call Timeout.stop();
+
         for ( i=0; i<4; i++ ) {
             class[i] = 0;
         }
@@ -170,7 +172,7 @@ module TinyBSNC {
             dbg_clear("main", "MOVEMENT (M_THR <= avg <= C_THR)");
         }
 
-        dbg_clear("main", " [M_THR = %f; C_THR = %f]\n", M_THR, C_THR);
+        dbg_clear("main", " [M_THR = %.1lf; C_THR = %.1lf]\n", M_THR, C_THR);
 
         // Send the classication to the CN
         post sendClass();
@@ -207,9 +209,13 @@ module TinyBSNC {
      * This function manages the receiving of classifications from the PNs.
      * Only the CN should call this function.
      */
-    void recClass(message_t* pack) {
+    void recClass() {
 
-        if ( call Timeout.isRunning() == TRUE ) {
+        if ( count == 0 ) {
+            call Timeout.startOneShot(CN_TOUT);
+        }
+
+        if ( call Timeout.isRunning() == TRUE || count == 0 ) {
             class[msg->value]++;
             count++;
 
@@ -228,11 +234,9 @@ module TinyBSNC {
                 default: break;
             }
 
-            dbg_clear("main", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
+            dbg_clear("main", " from node %d (%d of %d).\n", call AMPacket.source(&packet), count, N_PNS);
 
             if ( count == N_PNS ) {
-                call Timeout.stop();
-
                 call ECGSensor.read();
             }
 
@@ -371,11 +375,7 @@ module TinyBSNC {
         if ( TOS_NODE_ID == 0 ) {
             // Received classification from a PN
 
-            if ( count == 0 ) {
-                call Timeout.startOneShot(CN_TOUT);
-            }
-
-            recClass(buf);
+            recClass();
         } else {
             // Received START command from the CN
 
