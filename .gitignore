@@ -6,3 +6,5 @@
 *TOSSIM*.*
 _TOSSIMmodule.so
 app.xml
+*.class
+*Msg.java
