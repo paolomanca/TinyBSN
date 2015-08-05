@@ -11,6 +11,10 @@ from TOSSIM import *;
 
 t = Tossim([]);
 
+sf = SerialForwarder(9001);
+throttle = Throttle(t, 10);
+sf_process=True;
+sf_throttle=True;
 
 topofile="topology.txt";
 modelfile="meyer-heavy.txt";
@@ -34,10 +38,10 @@ t.init();
 out = sys.stdout;
 
 #Add debug channel
-print "Activate debug message on channel init"
-t.addChannel("init",out);
-print "Activate debug message on channel boot"
-t.addChannel("boot",out);
+#print "Activate debug message on channel init"
+#t.addChannel("init",out);
+#print "Activate debug message on channel boot"
+#t.addChannel("boot",out);
 #print "Activate debug message on channel radio"
 #t.addChannel("radio",out);
 #print "Activate debug message on channel radio_send"
@@ -52,8 +56,8 @@ t.addChannel("boot",out);
 #t.addChannel("role",out);
 #print "Activate debug message on channel role_fine"
 #t.addChannel("role_fine",out);
-print "Activate debug message on channel role_coarse"
-t.addChannel("role_coarse",out);
+#print "Activate debug message on channel role_coarse"
+#t.addChannel("role_coarse",out);
 print "Activate debug message on channel app_out"
 t.addChannel("app_out",out);
 
@@ -110,8 +114,19 @@ print "\n"
 
 print "Start simulation with TOSSIM! \n\n";
 
+if ( sf_process == True ):
+	sf.process();
+if ( sf_throttle == True ):
+	throttle.initialize();
+
 while t.time() <= 130*t.ticksPerSecond():
     t.runNextEvent()
+    if ( sf_throttle == True ):
+	    throttle.checkThrottle();
+    if ( sf_process == True ):
+	    sf.process();
 
 print "\n\nSimulation finished!";
+
+throttle.printStatistics()
 

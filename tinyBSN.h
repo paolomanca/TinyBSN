@@ -23,14 +23,22 @@
 #define MOVEMENT 2
 #define CRISIS 3
 
-typedef nx_struct my_msg {
+typedef nx_struct bsn_msg {
 		nx_uint8_t msg_type;
 		nx_uint16_t msg_id;
 		nx_uint8_t value;
-} my_msg_t;
+} bsn_msg_t;
 
 enum{
 	AM_MY_MSG = 6,
+};
+
+typedef nx_struct test_serial_msg {
+  nx_uint16_t sample_value;
+} test_serial_msg_t;
+
+enum {
+  AM_TEST_SERIAL_MSG = 0x89,
 };
 
 /*
@@ -44,7 +52,7 @@ enum{
 #define PN_TOUT 15000
 
 /** CN wait from the first received classification before abort **/
-#define CN_TOUT 5000
+#define CN_TOUT 10000
 
 
 #endif

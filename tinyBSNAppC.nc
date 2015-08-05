@@ -22,6 +22,9 @@ implementation {
     components new ACCSensorC() as Accelerometer;
     components new ECGSensorC() as ECG;
 
+    components SerialActiveMessageC as SerialAM;
+    
+
     //Boot interface
     App.Boot -> MainC.Boot;
 
@@ -30,7 +33,12 @@ implementation {
     App.AMSend -> AMSenderC;
 
     //Radio Control
-    App.SplitControl -> ActiveMessageC;
+    App.Radio -> ActiveMessageC;
+
+    // Serial Port
+    App.Serial -> SerialAM;
+    App.SerialPack -> SerialAM;
+    App.SerialSend -> SerialAM.AMSend[AM_TEST_SERIAL_MSG];
 
     //Interfaces to access package fields
     App.AMPacket -> AMSenderC;

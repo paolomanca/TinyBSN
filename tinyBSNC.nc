@@ -22,9 +22,12 @@ module tinyBSNC {
         interface Boot;
         interface AMPacket;
         interface Packet;
+        interface Packet as SerialPack;
         interface PacketAcknowledgements;
         interface AMSend;
-        interface SplitControl;
+        interface SplitControl as Radio;
+        interface SplitControl as Serial;
+        interface AMSend as SerialSend;
         interface Receive;
         interface Timer<TMilli> as MilliTimer;
         interface Timer<TMilli> as Timeout;
@@ -74,7 +77,7 @@ module tinyBSNC {
     /*
      * Message variable
      */
-    my_msg_t* msg;
+    bsn_msg_t* msg;
 
     /*
      * Last sent message
@@ -114,7 +117,7 @@ module tinyBSNC {
     task void sendStart() {
 
         // Composing the message
-        msg = (my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+        msg = (bsn_msg_t*)(call Packet.getPayload(&packet,sizeof(bsn_msg_t)));
         msg->msg_type = REQ;
         msg->msg_id = msg_count++;
         msg->value = START;
@@ -123,7 +126,7 @@ module tinyBSNC {
 
         call PacketAcknowledgements.requestAck( &packet );
 
-        if(call AMSend.send(count+1,&packet,sizeof(my_msg_t)) == SUCCESS) {
+        if(call AMSend.send(count+1,&packet,sizeof(bsn_msg_t)) == SUCCESS) {
 
             dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
             dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
@@ -195,7 +198,7 @@ module tinyBSNC {
     task void sendClass() {
 
 	    if ( call Timeout.isRunning() == TRUE ) {
-            msg = (my_msg_t*)(call Packet.getPayload(&packet,sizeof(my_msg_t)));
+            msg = (bsn_msg_t*)(call Packet.getPayload(&packet,sizeof(bsn_msg_t)));
             msg->msg_type = RES;
             msg->msg_id = msg_count++;
             msg->value = class[0];
@@ -204,7 +207,7 @@ module tinyBSNC {
 
             call PacketAcknowledgements.requestAck( &packet );
 
-            if(call AMSend.send(0,&packet,sizeof(my_msg_t)) == SUCCESS){
+            if(call AMSend.send(0,&packet,sizeof(bsn_msg_t)) == SUCCESS){
 
                 dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
                 dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n",
@@ -232,41 +235,61 @@ module tinyBSNC {
      * Only the CN should call this function.
      */
     void recClass(message_t* pack) {
-        class[msg->value]++;
-        count++;
 
-        if ( call Timeout.isRunning() == FALSE ) {
-            call Timeout.startOneShot(CN_TOUT);
+        if ( call Timeout.isRunning() == TRUE ) {
+            class[msg->value]++;
+            count++;
+
+            dbg("role_coarse", "[%s] Received classification ", sim_time_string());
+
+            switch(msg->value){
+                case NO_MOVEMENT:
+                    dbg_clear("role_coarse", "NO_MOVEMENT");
+                    break;
+                case MOVEMENT:
+                    dbg_clear("role_coarse", "MOVEMENT");
+                    break;
+                case CRISIS:
+                    dbg_clear("role_coarse", "CRISIS");
+                    break;
+                default: break;
+            }
+
+            dbg_clear("role_coarse", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
+
+            if ( count == N_PNS ) {
+                dbg("role", " Last classification received!\n");
+
+                call Timeout.stop();
+
+                call ECGSensor.read();
+            } else {
+                dbg_clear("role", "\n");
+            }
+
         }
 
-        dbg("role_coarse", "[%s] Received classification ", sim_time_string());
+    }
 
-        switch(msg->value){
-            case NO_MOVEMENT:
-                dbg_clear("role_coarse", "NO_MOVEMENT");
-                break;
-            case MOVEMENT:
-                dbg_clear("role_coarse", "MOVEMENT");
-                break;
-            case CRISIS:
-                dbg_clear("role_coarse", "CRISIS");
-                break;
-            default: break;
+    
+    /*
+     * This task sends the application output through the serial port.
+     * Only the CN should call this task.
+     */
+    task void sendAppOut() {
+
+        // Composing the message
+        test_serial_msg_t* msg_s = (test_serial_msg_t*)(call SerialPack.getPayload(&packet,sizeof(test_serial_msg_t)));
+        //msg->msg_id = msg_count++;
+        msg_s->sample_value = class[0];
+
+        dbg("radio_send", "[%s] Trying to send application output on the serial port.\n", sim_time_string());
+
+        if(call SerialSend.send(AM_BROADCAST_ADDR,&packet,sizeof(test_serial_msg_t)) == SUCCESS) {
+            dbg("radio_send", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
         }
 
-        dbg_clear("role_coarse", " from node %d (%d of %d).\n", call AMPacket.source(pack), count, N_PNS);
-
-        if ( count == N_PNS ) {
-            dbg("role", " Last classification received!\n");
-
-            call Timeout.stop();
-
-            call ECGSensor.read();
-        } else {
-            dbg_clear("role", "\n");
-        }
-
-    }     
+    }
 
 
     /*
@@ -276,11 +299,12 @@ module tinyBSNC {
         dbg("boot","[%s] Application booted.\n", sim_time_string());
 
         // Starting the radio
-        call SplitControl.start();
+        call Radio.start();
 
         // Starting the sensor
         if ( TOS_NODE_ID == 0 ) {
             call ECGSensorS.start();
+            call Serial.start();
         } else {
             call AccSensorS.start();
         }
@@ -294,7 +318,7 @@ module tinyBSNC {
      * - CN: trigger the starting procedure of the acquisition
      * - PN: 
      */
-    event void SplitControl.startDone(error_t err){
+    event void Radio.startDone(error_t err){
 
         if(err == SUCCESS) {
 
@@ -305,12 +329,12 @@ module tinyBSNC {
             }
 
         } else {
-            call SplitControl.start();
+            call Radio.start();
         }
 
     }
 
-    event void SplitControl.stopDone(error_t err){
+    event void Radio.stopDone(error_t err){
         dbg("radio", "[%s] Radio stopped!\n", sim_time_string());
     }
 
@@ -324,10 +348,10 @@ module tinyBSNC {
 
         if( buf == &packet && err == SUCCESS ) {
 
-            dbg("radio_send", "[%s] Packet sent to %d...", call AMPacket.destination(buf), sim_time_string());
+            dbg("radio_send", "[%s] Packet sent to %d...", sim_time_string(), call AMPacket.destination(buf));
 
             if ( call PacketAcknowledgements.wasAcked(buf) ) {
-                dbg_clear("radio_ack", "and ack received");
+                dbg_clear("radio_ack", "and ack received.\n");
 
                 if ( TOS_NODE_ID == 0 ) {
                     // START command ackwnoledged
@@ -348,7 +372,7 @@ module tinyBSNC {
                 }
 
             } else {
-                dbg_clear("radio_ack", "but ack was not received");
+                dbg_clear("radio_ack", "but ack was not received.\n");
 
                 if ( TOS_NODE_ID == 0 ) {
                     // START command NOT ackwnoledged
@@ -371,9 +395,9 @@ module tinyBSNC {
      */
     event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
-        msg = (my_msg_t*) payload;
+        msg = (bsn_msg_t*) payload;
 
-        dbg("radio_rec","[%s] Message received.", sim_time_string());
+        dbg("radio_rec","[%s] Message received.\n", sim_time_string());
         dbg("radio_pack",">>>Pack \n \t Payload length %hhu \n", call Packet.payloadLength(buf) );
         dbg_clear("radio_pack","\t Source: %hhu \n", call AMPacket.source(buf) );
         dbg_clear("radio_pack","\t Destination: %hhu \n", call AMPacket.destination(buf) );
@@ -386,6 +410,10 @@ module tinyBSNC {
 
         if ( TOS_NODE_ID == 0 ) {
             // Received classification from a PN
+
+            if ( count == 0 ) {
+                call Timeout.startOneShot(CN_TOUT);
+            }
 
             recClass(buf);
         } else {
@@ -412,6 +440,23 @@ module tinyBSNC {
 
     }
   
+    /*
+     * SERIAL PORT
+     */
+    event void Serial.startDone(error_t err) {
+        if ( err == SUCCESS ) {
+            dbg("app_out", "Serial port started.\n");
+        }
+    }
+    
+    event void Serial.stopDone(error_t err) {}
+
+    event void SerialSend.sendDone(message_t* buf,error_t err) {
+
+        if( err == SUCCESS ) {
+            dbg("radio_send", "[%s] Serial packet sent.\n", sim_time_string());
+        }
+    }
 
 
     /*
@@ -469,22 +514,26 @@ module tinyBSNC {
                 if ( class[CRISIS] >= 2 ) {
                     dbg_clear("role_coarse", "and at least two nodes detected CRISIS.\n");
                     dbg("app_out", "[%s] Application output: ALARM!\n", sim_time_string());
+                    class[0] = CRISIS;
                 } else {
                     dbg_clear("role_coarse", "but less than two nodes detected CRISIS.\n");
                     dbg("app_out", "[%s] Application output: MOVEMENT.\n", sim_time_string());
+                    class[0] = MOVEMENT;
                 }
 
             } else {
                 dbg("role_coarse", "[%s] No Heart Rate variation detected.\n", sim_time_string());
                 dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
+                class[0] = NO_MOVEMENT;
             }
 
         } else {
             dbg("role_coarse", "[%s] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.\n", sim_time_string());
             dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
+            class[0] = NO_MOVEMENT;
         }    
 
-
+        post sendAppOut();
         post start();
     }
 
