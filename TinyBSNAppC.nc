@@ -1,21 +1,18 @@
 /*
- *  Configuration file for wiring of tinyBSNC module to other common 
+ *  Configuration file for wiring of TinyBSNC module to other common 
  *  components needed for proper functioning
- *
- *  Code managing the comunications from PNs to the CN's taken from the
- *  module sendAck by Luca Pietro Borsani.
  *
  *  @author Paolo Manca
  */
 
-#include "tinyBSN.h"
+#include "TinyBSN.h"
 
-configuration tinyBSNAppC {}
+configuration TinyBSNAppC {}
 
 implementation {
-    components MainC, tinyBSNC as App;
-    components new AMSenderC(AM_MY_MSG);
-    components new AMReceiverC(AM_MY_MSG);
+    components MainC, TinyBSNC as App;
+    components new AMSenderC(AM_BSN_MSG);
+    components new AMReceiverC(AM_BSN_MSG);
     components ActiveMessageC;
     components new TimerMilliC() as TMilli;
     components new TimerMilliC() as Timeout;
@@ -38,7 +35,7 @@ implementation {
     // Serial Port
     App.Serial -> SerialAM;
     App.SerialPack -> SerialAM;
-    App.SerialSend -> SerialAM.AMSend[AM_TEST_SERIAL_MSG];
+    App.SerialSend -> SerialAM.AMSend[AM_BSN_MSG];
 
     //Interfaces to access package fields
     App.AMPacket -> AMSenderC;

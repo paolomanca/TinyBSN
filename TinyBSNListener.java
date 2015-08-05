@@ -36,27 +36,27 @@ import net.tinyos.message.*;
 import net.tinyos.packet.*;
 import net.tinyos.util.*;
 
-public class TestSerial implements MessageListener {
+public class TinyBSNListener implements MessageListener {
 
   private MoteIF moteIF;
   
-  public TestSerial(MoteIF moteIF) {
+  public TinyBSNListener(MoteIF moteIF) {
     this.moteIF = moteIF;
-    this.moteIF.registerListener(new TestSerialMsg(), this);
+    this.moteIF.registerListener(new TinyBSNListenerMsg(), this);
   }
 
 
 
   public void messageReceived(int to, Message message) {
-    TestSerialMsg msg = (TestSerialMsg)message;
+    TinyBSNListenerMsg msg = (TinyBSNListenerMsg)message;
 
-    if( msg.get_sample_value() == 3 ) {
+    if( msg.get_value() == 3 ) {
         System.out.println("ALARM: seizure detected!");
     }
   }
   
   private static void usage() {
-    System.err.println("usage: TestSerial [-comm <source>]");
+    System.err.println("usage: TinyBSNListener [-comm <source>]");
   }
   
   public static void main(String[] args) throws Exception {
@@ -83,7 +83,7 @@ public class TestSerial implements MessageListener {
     }
 
     MoteIF mif = new MoteIF(phoenix);
-    TestSerial serial = new TestSerial(mif);
+    TinyBSNListener serial = new TinyBSNListener(mif);
 
   }
 

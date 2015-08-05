@@ -1,22 +1,19 @@
 /*
- *  Source file for implementation of module tinyBSN, which implements a Body Sensor Network (BSN)
+ *  Source file for implementation of module TinyBSN, which implements a Body Sensor Network (BSN)
  *  composed of four wireless accelerometers (two for the wrists, and two for the ankles) and one
  *  wireless ElectroCardioGram (ECG) sensor, mounted on the chest.
  *  The BSN is organized in a star topology, with the ECG sensor acting as the central node (CN).
  *  The CN is also responsible for controlling the peripheral nodes (PN), by triggering the
  *  monitoring process.
  *
- *  Code managing the comunications from PNs to the CN's taken from the
- *  module sendAck by Luca Pietro Borsani.
- *
  *  @author Paolo Manca
  * 
  */
 
-#include "tinyBSN.h"
+#include "TinyBSN.h"
 #include "Timer.h"
 
-module tinyBSNC {
+module TinyBSNC {
 
     uses {
         interface Boot;
@@ -127,7 +124,7 @@ module tinyBSNC {
         call PacketAcknowledgements.requestAck( &packet );
 
         if(call AMSend.send(count+1,&packet,sizeof(bsn_msg_t)) == SUCCESS) {
-            dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
+            dbg("verbose", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
         }
 
     }
@@ -197,7 +194,7 @@ module tinyBSNC {
             call PacketAcknowledgements.requestAck( &packet );
 
             if(call AMSend.send(0,&packet,sizeof(bsn_msg_t)) == SUCCESS){
-                dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
+                dbg("verbose", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
             }
         } else {
             dbg("warn", "[%s] Can't send classification, time is out.", sim_time_string());
@@ -251,14 +248,14 @@ module tinyBSNC {
     task void sendAppOut() {
 
         // Composing the message
-        test_serial_msg_t* msg_s = (test_serial_msg_t*)(call SerialPack.getPayload(&packet,sizeof(test_serial_msg_t)));
+        bsn_msg_t* msg_s = (bsn_msg_t*)(call SerialPack.getPayload(&packet,sizeof(bsn_msg_t)));
         //msg->msg_id = msg_count++;
-        msg_s->sample_value = class[0];
+        msg_s->value = class[0];
 
         dbg("main", "[%s] Sending application output on the serial port.\n", sim_time_string());
 
-        if(call SerialSend.send(AM_BROADCAST_ADDR,&packet,sizeof(test_serial_msg_t)) == SUCCESS) {
-            dbg("info", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
+        if(call SerialSend.send(AM_BROADCAST_ADDR,&packet,sizeof(bsn_msg_t)) == SUCCESS) {
+            dbg("verbose", "[%s] Packet passed to lower layer successfully!\n", sim_time_string());
         }
 
     }
@@ -369,7 +366,7 @@ module tinyBSNC {
 
         msg = (bsn_msg_t*) payload;
 
-        dbg("info","[%s] Message received.\n", sim_time_string());
+        dbg("verbose","[%s] Message received.\n", sim_time_string());
 
         if ( TOS_NODE_ID == 0 ) {
             // Received classification from a PN
@@ -418,6 +415,9 @@ module tinyBSNC {
 
         if( err == SUCCESS ) {
             dbg("info", "[%s] Serial packet sent.\n", sim_time_string());
+            post start();
+        } else {
+            post sendAppOut();
         }
     }
 
@@ -497,7 +497,6 @@ module tinyBSNC {
         }    
 
         post sendAppOut();
-        post start();
     }
 
     event void ECGSensorS.startDone(error_t err) {
