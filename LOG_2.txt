@@ -1,0 +1,671 @@
+********************************************
+*                                          *
+*             TOSSIM Script                *
+*                                          *
+********************************************
+Initializing mac....
+Initializing radio channels....
+    using topology file: topology.txt
+    using noise file: meyer-heavy.txt
+Initializing simulator....
+Activate debug message on channel info
+Activate debug message on channel main
+Activate debug message on channel warn
+Activate debug message on channel app_out
+
+
+Creating node 0 ...
+>>>Will boot at time 0 [sec]
+Creating node 1 ...
+>>>Will boot at time 0 [sec]
+Creating node 2 ...
+>>>Will boot at time 0 [sec]
+Creating node 3 ...
+>>>Will boot at time 0 [sec]
+Creating node 4 ...
+>>>Will boot at time 0 [sec]
+
+
+Creating radio channels...
+>>>Setting radio channel from node  0  to node  1  with gain  -60.0  dBm
+>>>Setting radio channel from node  1  to node  0  with gain  -60.0  dBm
+>>>Setting radio channel from node  0  to node  2  with gain  -60.0  dBm
+>>>Setting radio channel from node  2  to node  0  with gain  -60.0  dBm
+>>>Setting radio channel from node  0  to node  3  with gain  -60.0  dBm
+>>>Setting radio channel from node  3  to node  0  with gain  -60.0  dBm
+>>>Setting radio channel from node  0  to node  4  with gain  -60.0  dBm
+>>>Setting radio channel from node  4  to node  0  with gain  -60.0  dBm
+
+
+Initializing Closest Pattern Matching (CPM)...
+Reading noise model data file: meyer-heavy.txt
+Loading:##Done!
+>>>Creating noise model for node: 0
+>>>Creating noise model for node: 1
+>>>Creating noise model for node: 2
+>>>Creating noise model for node: 3
+>>>Creating noise model for node: 4
+
+
+Start simulation with TOSSIM! 
+
+
+DEBUG (0): [0:0:0.000000000] Application booted.
+DEBUG (4): [0:0:0.000000000] Application booted.
+DEBUG (2): [0:0:0.000000000] Application booted.
+DEBUG (1): [0:0:0.000000000] Application booted.
+DEBUG (3): [0:0:0.000000000] Application booted.
+DEBUG (0): [0:0:0.000000010] Radio started!
+DEBUG (1): [0:0:0.000000010] Radio started!
+DEBUG (3): [0:0:0.000000010] Radio started!
+DEBUG (2): [0:0:0.000000010] Radio started!
+DEBUG (4): [0:0:0.000000010] Radio started!
+DEBUG (0): Serial port started.
+
+DEBUG (0): [0:0:0.000000040] Starting a new acquisition!
+DEBUG (0): [0:0:0.000000050] Sending START command to node 1.
+DEBUG (3): [0:0:0.001953135] Accelerometer started!
+DEBUG (4): [0:0:0.001953135] Accelerometer started!
+DEBUG (0): [0:0:0.001953135] ECG started!
+DEBUG (2): [0:0:0.001953135] Accelerometer started!
+DEBUG (1): [0:0:0.001953135] Accelerometer started!
+DEBUG (1): [0:0:0.005554216] Starting acquisition.
+DEBUG (0): [0:0:0.005722062] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:0.005722072] Sending START command to node 2.
+DEBUG (2): [0:0:0.009109503] Starting acquisition.
+DEBUG (0): [0:0:0.009277349] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:0.009277359] Sending START command to node 3.
+DEBUG (3): [0:0:0.015914894] Starting acquisition.
+DEBUG (0): [0:0:0.016082739] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:0.016082749] Sending START command to node 4.
+DEBUG (4): [0:0:0.022857612] Starting acquisition.
+DEBUG (0): [0:0:0.023025458] Packet sent to 4...and ack received.
+clients 1, read 0, wrote 0
+DEBUG (1): [0:0:9.821289072] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:9.821289082] Rescaling samples...
+DEBUG (1): [0:0:9.821289082] Sample average: 0.040665 
+DEBUG (1): [0:0:9.821289082] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:9.821289102] Sending classification to node 0.
+DEBUG (2): [0:0:9.825195322] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:9.825195332] Rescaling samples...
+DEBUG (2): [0:0:9.825195332] Sample average: 0.038834 
+DEBUG (2): [0:0:9.825195332] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:9.825195352] Sending classification to node 0.
+DEBUG (0): [0:0:9.826889045] Received classification NO_MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:0:9.827056891] Packet sent to 0...and ack received.
+DEBUG (3): [0:0:9.832031260] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:9.832031270] Rescaling samples...
+DEBUG (3): [0:0:9.832031270] Sample average: 0.080609 
+DEBUG (3): [0:0:9.832031270] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:9.832031290] Sending classification to node 0.
+DEBUG (0): [0:0:9.835403422] Received classification NO_MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:0:9.835571268] Packet sent to 0...and ack received.
+DEBUG (4): [0:0:9.838867197] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:9.838867207] Rescaling samples...
+DEBUG (4): [0:0:9.838867207] Sample average: 0.080134 
+DEBUG (4): [0:0:9.838867207] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:9.838867227] Sending classification to node 0.
+DEBUG (0): [0:0:9.841308579] Received classification NO_MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:0:9.841476425] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:9.844772344] Received classification NO_MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:9.844940190] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:9.846679697] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:0:9.846679697] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:9.846679707] Sending application output on the serial port.
+DEBUG (0): [0:0:9.846679727] Serial packet sent.
+
+DEBUG (0): [0:0:9.846679737] Starting a new acquisition!
+DEBUG (0): [0:0:9.846679747] Sending START command to node 1.
+DEBUG (1): [0:0:9.849548383] Starting acquisition.
+DEBUG (0): [0:0:9.849716228] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:9.849716238] Sending START command to node 2.
+DEBUG (2): [0:0:9.854461694] Starting acquisition.
+DEBUG (0): [0:0:9.854629540] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:9.854629550] Sending START command to node 3.
+DEBUG (3): [0:0:9.864959690] Starting acquisition.
+DEBUG (0): [0:0:9.865127535] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:9.865127545] Sending START command to node 4.
+DEBUG (0): [0:0:9.872314393] Packet sent to 4...but ack was not received.
+DEBUG (0): [0:0:9.872314403] Sending START command to node 4.
+DEBUG (0): [0:0:9.881622210] Packet sent to 4...but ack was not received.
+DEBUG (0): [0:0:9.881622220] Sending START command to node 4.
+DEBUG (4): [0:0:9.888458118] Starting acquisition.
+DEBUG (0): [0:0:9.888625963] Packet sent to 4...and ack received.
+DEBUG (1): [0:0:19.665039072] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:19.665039082] Rescaling samples...
+DEBUG (1): [0:0:19.665039082] Sample average: 0.681952 
+DEBUG (1): [0:0:19.665039082] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:19.665039102] Sending classification to node 0.
+DEBUG (0): [0:0:19.668960588] Received classification MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:0:19.669128434] Packet sent to 0...and ack received.
+DEBUG (2): [0:0:19.669921885] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:19.669921895] Rescaling samples...
+DEBUG (2): [0:0:19.669921895] Sample average: 0.786988 
+DEBUG (2): [0:0:19.669921895] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:19.669921915] Sending classification to node 0.
+DEBUG (0): [0:0:19.674606335] Received classification MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:0:19.674774181] Packet sent to 0...and ack received.
+DEBUG (3): [0:0:19.680664072] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:19.680664082] Rescaling samples...
+DEBUG (3): [0:0:19.680664082] Sample average: 1.364885 
+DEBUG (3): [0:0:19.680664082] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:19.680664102] Sending classification to node 0.
+DEBUG (0): [0:0:19.684539812] Received classification MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:0:19.684707658] Packet sent to 0...and ack received.
+DEBUG (4): [0:0:19.704101572] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:19.704101582] Rescaling samples...
+DEBUG (4): [0:0:19.704101582] Sample average: 1.354152 
+DEBUG (4): [0:0:19.704101582] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:19.704101602] Sending classification to node 0.
+DEBUG (0): [0:0:19.707168601] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:19.707336446] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:19.708984385] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:0:19.708984385] No Heart Rate variation detected.
+DEBUG (0): [0:0:19.708984385] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:19.708984395] Sending application output on the serial port.
+DEBUG (0): [0:0:19.708984415] Serial packet sent.
+
+DEBUG (0): [0:0:19.708984425] Starting a new acquisition!
+DEBUG (0): [0:0:19.708984435] Sending START command to node 1.
+DEBUG (1): [0:0:19.715591452] Starting acquisition.
+DEBUG (0): [0:0:19.715759297] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:19.715759307] Sending START command to node 2.
+DEBUG (2): [0:0:19.718139665] Starting acquisition.
+DEBUG (0): [0:0:19.718307510] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:19.718307520] Sending START command to node 3.
+DEBUG (3): [0:0:19.721130380] Starting acquisition.
+DEBUG (0): [0:0:19.721298225] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:19.721298235] Sending START command to node 4.
+DEBUG (4): [0:0:19.727554302] Starting acquisition.
+DEBUG (0): [0:0:19.727722148] Packet sent to 4...and ack received.
+DEBUG (1): [0:0:29.531250010] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:29.531250020] Rescaling samples...
+DEBUG (1): [0:0:29.531250020] Sample average: 0.763182 
+DEBUG (1): [0:0:29.531250020] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:29.531250040] Sending classification to node 0.
+DEBUG (2): [0:0:29.534179697] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:29.534179707] Rescaling samples...
+DEBUG (2): [0:0:29.534179707] Sample average: 0.755150 
+DEBUG (2): [0:0:29.534179707] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:29.534179727] Sending classification to node 0.
+DEBUG (1): [0:0:29.536560067] Packet sent to 0...but ack was not received.
+DEBUG (1): [0:0:29.536560077] Sending classification to node 0.
+DEBUG (2): [0:0:29.536804223] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:29.536804233] Sending classification to node 0.
+DEBUG (3): [0:0:29.537109385] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:29.537109395] Rescaling samples...
+DEBUG (3): [0:0:29.537109395] Sample average: 1.338773 
+DEBUG (3): [0:0:29.537109395] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:29.537109415] Sending classification to node 0.
+DEBUG (1): [0:0:29.539031987] Packet sent to 0...but ack was not received.
+DEBUG (1): [0:0:29.539031997] Sending classification to node 0.
+DEBUG (2): [0:0:29.539642352] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:29.539642362] Sending classification to node 0.
+DEBUG (0): [0:0:29.540771503] Received classification MOVEMENT from node 3 (1 of 4).
+DEBUG (3): [0:0:29.540939348] Packet sent to 0...and ack received.
+DEBUG (1): [0:0:29.543167104] Packet sent to 0...but ack was not received.
+DEBUG (1): [0:0:29.543167114] Sending classification to node 0.
+DEBUG (2): [0:0:29.543563848] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:29.543563858] Sending classification to node 0.
+DEBUG (4): [0:0:29.543945322] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:29.543945332] Rescaling samples...
+DEBUG (4): [0:0:29.543945332] Sample average: 1.341818 
+DEBUG (4): [0:0:29.543945332] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:29.543945352] Sending classification to node 0.
+DEBUG (0): [0:0:29.548294037] Received classification MOVEMENT from node 1 (2 of 4).
+DEBUG (1): [0:0:29.548461883] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:29.550537083] Received classification MOVEMENT from node 2 (3 of 4).
+DEBUG (2): [0:0:29.550704929] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:29.550704939] Sending classification to node 0.
+DEBUG (0): [0:0:29.551925652] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:29.552093498] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:29.553298918] Received classification MOVEMENT from node 2 (5 of 4).
+DEBUG (2): [0:0:29.553466764] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:29.553710947] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:0:29.553710947] No Heart Rate variation detected.
+DEBUG (0): [0:0:29.553710947] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:29.553710957] Sending application output on the serial port.
+DEBUG (0): [0:0:29.553710977] Serial packet sent.
+
+DEBUG (0): [0:0:29.553710987] Starting a new acquisition!
+DEBUG (0): [0:0:29.553710997] Sending START command to node 1.
+DEBUG (0): [0:0:29.564346311] Packet sent to 1...but ack was not received.
+DEBUG (0): [0:0:29.564346321] Sending START command to node 1.
+DEBUG (1): [0:0:29.568115220] Starting acquisition.
+DEBUG (0): [0:0:29.568283066] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:29.568283076] Sending START command to node 2.
+DEBUG (2): [0:0:29.570312483] Starting acquisition.
+DEBUG (0): [0:0:29.570480328] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:29.570480338] Sending START command to node 3.
+DEBUG (3): [0:0:29.579727111] Starting acquisition.
+DEBUG (0): [0:0:29.579894956] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:29.579894966] Sending START command to node 4.
+DEBUG (4): [0:0:29.586334138] Starting acquisition.
+DEBUG (0): [0:0:29.586501983] Packet sent to 4...and ack received.
+DEBUG (1): [0:0:39.383789072] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:39.383789082] Rescaling samples...
+DEBUG (1): [0:0:39.383789082] Sample average: 0.719779 
+DEBUG (1): [0:0:39.383789082] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:39.383789102] Sending classification to node 0.
+DEBUG (2): [0:0:39.385742197] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:39.385742207] Rescaling samples...
+DEBUG (2): [0:0:39.385742207] Sample average: 0.768155 
+DEBUG (2): [0:0:39.385742207] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:39.385742227] Sending classification to node 0.
+DEBUG (0): [0:0:39.387420673] Received classification MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:0:39.387588518] Packet sent to 0...and ack received.
+DEBUG (2): [0:0:39.388977071] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:39.388977081] Sending classification to node 0.
+DEBUG (2): [0:0:39.392715463] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:39.392715473] Sending classification to node 0.
+DEBUG (3): [0:0:39.395507822] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:39.395507832] Rescaling samples...
+DEBUG (3): [0:0:39.395507832] Sample average: 1.316457 
+DEBUG (3): [0:0:39.395507832] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:39.395507852] Sending classification to node 0.
+DEBUG (0): [0:0:39.397628774] Received classification MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:0:39.397796620] Packet sent to 0...and ack received.
+DEBUG (4): [0:0:39.402343760] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:39.402343770] Rescaling samples...
+DEBUG (4): [0:0:39.402343770] Sample average: 1.322572 
+DEBUG (4): [0:0:39.402343770] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:39.402343790] Sending classification to node 0.
+DEBUG (0): [0:0:39.402816769] Received classification MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:0:39.402984615] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:39.410888662] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:39.411056507] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:39.412109385] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:0:39.412109385] Heart Rate variation detected but less than two nodes detected CRISIS.
+DEBUG (0): [0:0:39.412109385] Application output: MOVEMENT.
+DEBUG (0): [0:0:39.412109395] Sending application output on the serial port.
+DEBUG (0): [0:0:39.412109415] Serial packet sent.
+
+DEBUG (0): [0:0:39.412109425] Starting a new acquisition!
+DEBUG (0): [0:0:39.412109435] Sending START command to node 1.
+DEBUG (1): [0:0:39.415893592] Starting acquisition.
+DEBUG (0): [0:0:39.416061438] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:39.416061448] Sending START command to node 2.
+DEBUG (2): [0:0:39.422180187] Starting acquisition.
+DEBUG (0): [0:0:39.422348032] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:39.422348042] Sending START command to node 3.
+DEBUG (3): [0:0:39.426345822] Starting acquisition.
+DEBUG (0): [0:0:39.426513667] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:39.426513677] Sending START command to node 4.
+DEBUG (4): [0:0:39.430755596] Starting acquisition.
+DEBUG (0): [0:0:39.430923442] Packet sent to 4...and ack received.
+DEBUG (1): [0:0:49.231445322] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:49.231445332] Rescaling samples...
+DEBUG (1): [0:0:49.231445332] Sample average: 0.727110 
+DEBUG (1): [0:0:49.231445332] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:49.231445352] Sending classification to node 0.
+DEBUG (2): [0:0:49.238281260] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:49.238281270] Rescaling samples...
+DEBUG (2): [0:0:49.238281270] Sample average: 0.765446 
+DEBUG (2): [0:0:49.238281270] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:49.238281290] Sending classification to node 0.
+DEBUG (0): [0:0:49.239028926] Received classification MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:0:49.239196772] Packet sent to 0...and ack received.
+DEBUG (3): [0:0:49.242187510] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:49.242187520] Rescaling samples...
+DEBUG (3): [0:0:49.242187520] Sample average: 3.238028 
+DEBUG (3): [0:0:49.242187520] Classified as CRISIS (avg > C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:49.242187540] Sending classification to node 0.
+DEBUG (2): [0:0:49.245208739] Packet sent to 0...but ack was not received.
+DEBUG (2): [0:0:49.245208749] Sending classification to node 0.
+DEBUG (3): [0:0:49.245742817] Packet sent to 0...but ack was not received.
+DEBUG (3): [0:0:49.245742827] Sending classification to node 0.
+DEBUG (4): [0:0:49.247070322] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:49.247070332] Rescaling samples...
+DEBUG (4): [0:0:49.247070332] Sample average: 1.306233 
+DEBUG (4): [0:0:49.247070332] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:49.247070352] Sending classification to node 0.
+DEBUG (0): [0:0:49.247085569] Received classification MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:0:49.247253415] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:49.254379251] Received classification CRISIS from node 3 (3 of 4).
+DEBUG (3): [0:0:49.254547097] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:49.256103502] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:49.256271348] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:49.257812510] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:0:49.257812510] Heart Rate variation detected but less than two nodes detected CRISIS.
+DEBUG (0): [0:0:49.257812510] Application output: MOVEMENT.
+DEBUG (0): [0:0:49.257812520] Sending application output on the serial port.
+DEBUG (0): [0:0:49.257812540] Serial packet sent.
+
+DEBUG (0): [0:0:49.257812550] Starting a new acquisition!
+DEBUG (0): [0:0:49.257812560] Sending START command to node 1.
+DEBUG (1): [0:0:49.261840856] Starting acquisition.
+DEBUG (0): [0:0:49.262008702] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:49.262008712] Sending START command to node 2.
+DEBUG (2): [0:0:49.268524177] Starting acquisition.
+DEBUG (0): [0:0:49.268692023] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:49.268692033] Sending START command to node 3.
+DEBUG (3): [0:0:49.274993876] Starting acquisition.
+DEBUG (0): [0:0:49.275161721] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:49.275161731] Sending START command to node 4.
+DEBUG (4): [0:0:49.286147995] Starting acquisition.
+DEBUG (0): [0:0:49.286315841] Packet sent to 4...and ack received.
+DEBUG (1): [0:0:59.078125010] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:0:59.078125020] Rescaling samples...
+DEBUG (1): [0:0:59.078125020] Sample average: 0.727060 
+DEBUG (1): [0:0:59.078125020] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:0:59.078125040] Sending classification to node 0.
+DEBUG (2): [0:0:59.083984385] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:0:59.083984395] Rescaling samples...
+DEBUG (2): [0:0:59.083984395] Sample average: 0.743367 
+DEBUG (2): [0:0:59.083984395] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:0:59.083984415] Sending classification to node 0.
+DEBUG (0): [0:0:59.085754390] Received classification MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:0:59.085922235] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:59.088577283] Received classification MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:0:59.088745129] Packet sent to 0...and ack received.
+DEBUG (3): [0:0:59.090820322] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:0:59.090820332] Rescaling samples...
+DEBUG (3): [0:0:59.090820332] Sample average: 1.380448 
+DEBUG (3): [0:0:59.090820332] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:0:59.090820352] Sending classification to node 0.
+DEBUG (3): [0:0:59.096160897] Packet sent to 0...but ack was not received.
+DEBUG (3): [0:0:59.096160907] Sending classification to node 0.
+DEBUG (0): [0:0:59.097854623] Received classification MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:0:59.098022468] Packet sent to 0...and ack received.
+DEBUG (4): [0:0:59.102539072] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:0:59.102539082] Rescaling samples...
+DEBUG (4): [0:0:59.102539082] Sample average: 1.311911 
+DEBUG (4): [0:0:59.102539082] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:0:59.102539102] Sending classification to node 0.
+DEBUG (0): [0:0:59.104675320] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:0:59.104843166] Packet sent to 0...and ack received.
+DEBUG (0): [0:0:59.106445322] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:0:59.106445322] No Heart Rate variation detected.
+DEBUG (0): [0:0:59.106445322] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:59.106445332] Sending application output on the serial port.
+DEBUG (0): [0:0:59.106445352] Serial packet sent.
+
+DEBUG (0): [0:0:59.106445362] Starting a new acquisition!
+DEBUG (0): [0:0:59.106445372] Sending START command to node 1.
+DEBUG (1): [0:0:59.115524299] Starting acquisition.
+DEBUG (0): [0:0:59.115692144] Packet sent to 1...and ack received.
+DEBUG (0): [0:0:59.115692154] Sending START command to node 2.
+DEBUG (2): [0:0:59.123031589] Starting acquisition.
+DEBUG (0): [0:0:59.123199435] Packet sent to 2...and ack received.
+DEBUG (0): [0:0:59.123199445] Sending START command to node 3.
+DEBUG (3): [0:0:59.126800498] Starting acquisition.
+DEBUG (0): [0:0:59.126968344] Packet sent to 3...and ack received.
+DEBUG (0): [0:0:59.126968354] Sending START command to node 4.
+DEBUG (4): [0:0:59.135375897] Starting acquisition.
+DEBUG (0): [0:0:59.135543743] Packet sent to 4...but ack was not received.
+DEBUG (0): [0:0:59.135543753] Sending START command to node 4.
+DEBUG (4): [0:0:59.140182398] Starting acquisition.
+DEBUG (4): [0:0:59.140182398] Acquisition already started!
+DEBUG (0): [0:0:59.140350243] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:8.931640635] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:8.931640645] Rescaling samples...
+DEBUG (1): [0:1:8.931640645] Sample average: 0.670113 
+DEBUG (1): [0:1:8.931640645] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:8.931640665] Sending classification to node 0.
+DEBUG (2): [0:1:8.938476572] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:8.938476582] Rescaling samples...
+DEBUG (2): [0:1:8.938476582] Sample average: 0.765127 
+DEBUG (2): [0:1:8.938476582] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:8.938476602] Sending classification to node 0.
+DEBUG (0): [0:1:8.941772441] Received classification MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:1:8.941940287] Packet sent to 0...and ack received.
+DEBUG (3): [0:1:8.942382822] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:8.942382832] Rescaling samples...
+DEBUG (3): [0:1:8.942382832] Sample average: 1.326478 
+DEBUG (3): [0:1:8.942382832] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:8.942382852] Sending classification to node 0.
+DEBUG (0): [0:1:8.945098878] Received classification MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:1:8.945266724] Packet sent to 0...and ack received.
+DEBUG (4): [0:1:8.951171885] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:8.951171895] Rescaling samples...
+DEBUG (4): [0:1:8.951171895] Sample average: 1.309267 
+DEBUG (4): [0:1:8.951171895] Classified as MOVEMENT (M_THR <= avg <= C_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:8.951171915] Sending classification to node 0.
+DEBUG (0): [0:1:8.951736435] Received classification MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:1:8.951904281] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:8.954025291] Received classification MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:1:8.954193137] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:8.955078135] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
+DEBUG (0): [0:1:8.955078135] Heart Rate variation detected but less than two nodes detected CRISIS.
+DEBUG (0): [0:1:8.955078135] Application output: MOVEMENT.
+DEBUG (0): [0:1:8.955078145] Sending application output on the serial port.
+DEBUG (0): [0:1:8.955078165] Serial packet sent.
+
+DEBUG (0): [0:1:8.955078175] Starting a new acquisition!
+DEBUG (0): [0:1:8.955078185] Sending START command to node 1.
+DEBUG (1): [0:1:8.962081928] Starting acquisition.
+DEBUG (0): [0:1:8.962249774] Packet sent to 1...and ack received.
+DEBUG (0): [0:1:8.962249784] Sending START command to node 2.
+DEBUG (2): [0:1:8.965225230] Starting acquisition.
+DEBUG (0): [0:1:8.965393076] Packet sent to 2...and ack received.
+DEBUG (0): [0:1:8.965393086] Sending START command to node 3.
+DEBUG (3): [0:1:8.970825183] Starting acquisition.
+DEBUG (0): [0:1:8.970993029] Packet sent to 3...and ack received.
+DEBUG (0): [0:1:8.970993039] Sending START command to node 4.
+DEBUG (4): [0:1:8.980651796] Starting acquisition.
+DEBUG (0): [0:1:8.980819641] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:18.778320322] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:18.778320332] Rescaling samples...
+DEBUG (1): [0:1:18.778320332] Sample average: 0.043300 
+DEBUG (1): [0:1:18.778320332] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:18.778320352] Sending classification to node 0.
+DEBUG (2): [0:1:18.781250010] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:18.781250020] Rescaling samples...
+DEBUG (2): [0:1:18.781250020] Sample average: 0.039165 
+DEBUG (2): [0:1:18.781250020] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:18.781250040] Sending classification to node 0.
+DEBUG (0): [0:1:18.784805317] Received classification NO_MOVEMENT from node 2 (1 of 4).
+DEBUG (2): [0:1:18.784973162] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:18.786575309] Received classification NO_MOVEMENT from node 1 (2 of 4).
+DEBUG (1): [0:1:18.786743154] Packet sent to 0...and ack received.
+DEBUG (3): [0:1:18.787109385] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:18.787109395] Rescaling samples...
+DEBUG (3): [0:1:18.787109395] Sample average: 0.081646 
+DEBUG (3): [0:1:18.787109395] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:18.787109415] Sending classification to node 0.
+DEBUG (0): [0:1:18.795318595] Received classification NO_MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:1:18.795486441] Packet sent to 0...and ack received.
+DEBUG (4): [0:1:18.796875010] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:18.796875020] Rescaling samples...
+DEBUG (4): [0:1:18.796875020] Sample average: 0.074856 
+DEBUG (4): [0:1:18.796875020] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:18.796875040] Sending classification to node 0.
+DEBUG (0): [0:1:18.798797636] Received classification NO_MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:1:18.798965481] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:18.799804697] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:1:18.799804697] Application output: NO_MOVEMENT.
+DEBUG (0): [0:1:18.799804707] Sending application output on the serial port.
+DEBUG (0): [0:1:18.799804727] Serial packet sent.
+
+DEBUG (0): [0:1:18.799804737] Starting a new acquisition!
+DEBUG (0): [0:1:18.799804747] Sending START command to node 1.
+DEBUG (1): [0:1:18.808486947] Starting acquisition.
+DEBUG (0): [0:1:18.808654793] Packet sent to 1...and ack received.
+DEBUG (0): [0:1:18.808654803] Sending START command to node 2.
+DEBUG (2): [0:1:18.813003533] Starting acquisition.
+DEBUG (0): [0:1:18.813171378] Packet sent to 2...and ack received.
+DEBUG (0): [0:1:18.813171388] Sending START command to node 3.
+DEBUG (3): [0:1:18.819427455] Starting acquisition.
+DEBUG (0): [0:1:18.819595301] Packet sent to 3...and ack received.
+DEBUG (0): [0:1:18.819595311] Sending START command to node 4.
+DEBUG (4): [0:1:18.826156552] Starting acquisition.
+DEBUG (0): [0:1:18.826324398] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:28.624023447] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:28.624023457] Rescaling samples...
+DEBUG (1): [0:1:28.624023457] Sample average: 0.044237 
+DEBUG (1): [0:1:28.624023457] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:28.624023477] Sending classification to node 0.
+DEBUG (2): [0:1:28.628906260] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:28.628906270] Rescaling samples...
+DEBUG (2): [0:1:28.628906270] Sample average: 0.045105 
+DEBUG (2): [0:1:28.628906270] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:28.628906290] Sending classification to node 0.
+DEBUG (0): [0:1:28.634613015] Received classification NO_MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:1:28.634780861] Packet sent to 0...and ack received.
+DEBUG (3): [0:1:28.635742197] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:28.635742207] Rescaling samples...
+DEBUG (3): [0:1:28.635742207] Sample average: 0.078640 
+DEBUG (3): [0:1:28.635742207] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:28.635742227] Sending classification to node 0.
+DEBUG (0): [0:1:28.637451162] Received classification NO_MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:1:28.637619007] Packet sent to 0...and ack received.
+DEBUG (4): [0:1:28.641601572] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:28.641601582] Rescaling samples...
+DEBUG (4): [0:1:28.641601582] Sample average: 0.084433 
+DEBUG (4): [0:1:28.641601582] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:28.641601602] Sending classification to node 0.
+DEBUG (0): [0:1:28.644943223] Received classification NO_MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:1:28.645111069] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:28.652481055] Received classification NO_MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:1:28.652648901] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:28.654296885] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:1:28.654296885] Application output: NO_MOVEMENT.
+DEBUG (0): [0:1:28.654296895] Sending application output on the serial port.
+DEBUG (0): [0:1:28.654296915] Serial packet sent.
+
+DEBUG (0): [0:1:28.654296925] Starting a new acquisition!
+DEBUG (0): [0:1:28.654296935] Sending START command to node 1.
+DEBUG (1): [0:1:28.661453265] Starting acquisition.
+DEBUG (0): [0:1:28.661621111] Packet sent to 1...and ack received.
+DEBUG (0): [0:1:28.661621121] Sending START command to node 2.
+DEBUG (2): [0:1:28.670074440] Starting acquisition.
+DEBUG (0): [0:1:28.670242286] Packet sent to 2...and ack received.
+DEBUG (0): [0:1:28.670242296] Sending START command to node 3.
+DEBUG (3): [0:1:28.673187225] Starting acquisition.
+DEBUG (0): [0:1:28.673355071] Packet sent to 3...and ack received.
+DEBUG (0): [0:1:28.673355081] Sending START command to node 4.
+DEBUG (4): [0:1:28.683441082] Starting acquisition.
+DEBUG (0): [0:1:28.683608927] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:38.477539072] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:38.477539082] Rescaling samples...
+DEBUG (1): [0:1:38.477539082] Sample average: 0.036413 
+DEBUG (1): [0:1:38.477539082] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:38.477539102] Sending classification to node 0.
+DEBUG (0): [0:1:38.479949977] Received classification NO_MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:1:38.480117822] Packet sent to 0...and ack received.
+DEBUG (2): [0:1:38.486328135] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:38.486328145] Rescaling samples...
+DEBUG (2): [0:1:38.486328145] Sample average: 0.044580 
+DEBUG (2): [0:1:38.486328145] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:38.486328165] Sending classification to node 0.
+DEBUG (3): [0:1:38.489257822] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:38.489257832] Rescaling samples...
+DEBUG (3): [0:1:38.489257832] Sample average: 0.083991 
+DEBUG (3): [0:1:38.489257832] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:38.489257852] Sending classification to node 0.
+DEBUG (0): [0:1:38.495025624] Received classification NO_MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:1:38.495193469] Packet sent to 0...and ack received.
+DEBUG (4): [0:1:38.499023447] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:38.499023457] Rescaling samples...
+DEBUG (4): [0:1:38.499023457] Sample average: 0.071987 
+DEBUG (4): [0:1:38.499023457] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:38.499023477] Sending classification to node 0.
+DEBUG (0): [0:1:38.500091529] Received classification NO_MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:1:38.500259375] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:38.503250137] Received classification NO_MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:1:38.503417983] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:38.504882822] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:1:38.504882822] Application output: NO_MOVEMENT.
+DEBUG (0): [0:1:38.504882832] Sending application output on the serial port.
+DEBUG (0): [0:1:38.504882852] Serial packet sent.
+
+DEBUG (0): [0:1:38.504882862] Starting a new acquisition!
+DEBUG (0): [0:1:38.504882872] Sending START command to node 1.
+DEBUG (1): [0:1:38.514907838] Starting acquisition.
+DEBUG (0): [0:1:38.515075684] Packet sent to 1...and ack received.
+DEBUG (0): [0:1:38.515075694] Sending START command to node 2.
+DEBUG (2): [0:1:38.524597122] Starting acquisition.
+DEBUG (0): [0:1:38.524764968] Packet sent to 2...and ack received.
+DEBUG (0): [0:1:38.524764978] Sending START command to node 3.
+DEBUG (3): [0:1:38.535598655] Starting acquisition.
+DEBUG (0): [0:1:38.535766501] Packet sent to 3...and ack received.
+DEBUG (0): [0:1:38.535766511] Sending START command to node 4.
+DEBUG (4): [0:1:38.542739737] Starting acquisition.
+DEBUG (0): [0:1:38.542907582] Packet sent to 4...but ack was not received.
+DEBUG (0): [0:1:38.542907592] Sending START command to node 4.
+DEBUG (4): [0:1:38.553649717] Starting acquisition.
+DEBUG (4): [0:1:38.553649717] Acquisition already started!
+DEBUG (0): [0:1:38.553817563] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:48.331054697] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:48.331054707] Rescaling samples...
+DEBUG (1): [0:1:48.331054707] Sample average: 0.040337 
+DEBUG (1): [0:1:48.331054707] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:48.331054727] Sending classification to node 0.
+DEBUG (0): [0:1:48.336166392] Received classification NO_MOVEMENT from node 1 (1 of 4).
+DEBUG (1): [0:1:48.336334237] Packet sent to 0...and ack received.
+DEBUG (2): [0:1:48.340820322] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:48.340820332] Rescaling samples...
+DEBUG (2): [0:1:48.340820332] Sample average: 0.039905 
+DEBUG (2): [0:1:48.340820332] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:48.340820352] Sending classification to node 0.
+DEBUG (0): [0:1:48.348022458] Received classification NO_MOVEMENT from node 2 (2 of 4).
+DEBUG (2): [0:1:48.348190304] Packet sent to 0...and ack received.
+DEBUG (3): [0:1:48.351562510] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:48.351562520] Rescaling samples...
+DEBUG (3): [0:1:48.351562520] Sample average: 0.075935 
+DEBUG (3): [0:1:48.351562520] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:48.351562540] Sending classification to node 0.
+DEBUG (3): [0:1:48.357406622] Packet sent to 0...but ack was not received.
+DEBUG (3): [0:1:48.357406632] Sending classification to node 0.
+DEBUG (4): [0:1:48.358398447] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:48.358398457] Rescaling samples...
+DEBUG (4): [0:1:48.358398457] Sample average: 0.085228 
+DEBUG (4): [0:1:48.358398457] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:48.358398477] Sending classification to node 0.
+DEBUG (0): [0:1:48.361038232] Received classification NO_MOVEMENT from node 4 (3 of 4).
+DEBUG (4): [0:1:48.361206078] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:48.367431598] Received classification NO_MOVEMENT from node 3 (4 of 4).
+DEBUG (3): [0:1:48.367599443] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:48.369140635] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:1:48.369140635] Application output: NO_MOVEMENT.
+DEBUG (0): [0:1:48.369140645] Sending application output on the serial port.
+DEBUG (0): [0:1:48.369140665] Serial packet sent.
+
+DEBUG (0): [0:1:48.369140675] Starting a new acquisition!
+DEBUG (0): [0:1:48.369140685] Sending START command to node 1.
+DEBUG (1): [0:1:48.375152612] Starting acquisition.
+DEBUG (0): [0:1:48.375320458] Packet sent to 1...and ack received.
+DEBUG (0): [0:1:48.375320468] Sending START command to node 2.
+DEBUG (2): [0:1:48.378479019] Starting acquisition.
+DEBUG (0): [0:1:48.378646865] Packet sent to 2...and ack received.
+DEBUG (0): [0:1:48.378646875] Sending START command to node 3.
+DEBUG (3): [0:1:48.386901831] Starting acquisition.
+DEBUG (0): [0:1:48.387069677] Packet sent to 3...and ack received.
+DEBUG (0): [0:1:48.387069687] Sending START command to node 4.
+DEBUG (4): [0:1:48.389526338] Starting acquisition.
+DEBUG (0): [0:1:48.389694183] Packet sent to 4...and ack received.
+DEBUG (1): [0:1:58.191406260] Buffer full! Stopping the acquisition...
+DEBUG (1): [0:1:58.191406270] Rescaling samples...
+DEBUG (1): [0:1:58.191406270] Sample average: 0.037275 
+DEBUG (1): [0:1:58.191406270] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (1): [0:1:58.191406290] Sending classification to node 0.
+DEBUG (2): [0:1:58.194335947] Buffer full! Stopping the acquisition...
+DEBUG (2): [0:1:58.194335957] Rescaling samples...
+DEBUG (2): [0:1:58.194335957] Sample average: 0.035025 
+DEBUG (2): [0:1:58.194335957] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (2): [0:1:58.194335977] Sending classification to node 0.
+DEBUG (0): [0:1:58.196090728] Received classification NO_MOVEMENT from node 2 (1 of 4).
+DEBUG (2): [0:1:58.196258573] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:58.201797464] Received classification NO_MOVEMENT from node 1 (2 of 4).
+DEBUG (1): [0:1:58.201965310] Packet sent to 0...and ack received.
+DEBUG (3): [0:1:58.203125010] Buffer full! Stopping the acquisition...
+DEBUG (3): [0:1:58.203125020] Rescaling samples...
+DEBUG (3): [0:1:58.203125020] Sample average: 0.077441 
+DEBUG (3): [0:1:58.203125020] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (3): [0:1:58.203125040] Sending classification to node 0.
+DEBUG (4): [0:1:58.205078135] Buffer full! Stopping the acquisition...
+DEBUG (4): [0:1:58.205078145] Rescaling samples...
+DEBUG (4): [0:1:58.205078145] Sample average: 0.076604 
+DEBUG (4): [0:1:58.205078145] Classified as NO_MOVEMENT (avg < M_THR) [M_THR = 0.5; C_THR = 2.0]
+DEBUG (4): [0:1:58.205078165] Sending classification to node 0.
+DEBUG (0): [0:1:58.210754390] Received classification NO_MOVEMENT from node 3 (3 of 4).
+DEBUG (3): [0:1:58.210922235] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:58.212997430] Received classification NO_MOVEMENT from node 4 (4 of 4).
+DEBUG (4): [0:1:58.213165276] Packet sent to 0...and ack received.
+DEBUG (0): [0:1:58.214843760] Less than 3 nodes detected MOVEMENT or CRISIS, no need to check ECG.
+DEBUG (0): [0:1:58.214843760] Application output: NO_MOVEMENT.
+DEBUG (0): [0:1:58.214843770] Sending application output on the serial port.
+DEBUG (0): [0:1:58.214843790] Serial packet sent.
+
+
+Simulation finished!
