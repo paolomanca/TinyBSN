@@ -161,7 +161,7 @@ DEBUG (0): [0:0:19.707168601] Received classification MOVEMENT from node 4 (4 of
 DEBUG (4): [0:0:19.707336446] Packet sent to 0...and ack received.
 DEBUG (0): [0:0:19.708984385] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
 DEBUG (0): [0:0:19.708984385] No Heart Rate variation detected.
-DEBUG (0): [0:0:19.708984385] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:19.708984385] Application output: MOVEMENT.
 DEBUG (0): [0:0:19.708984395] Sending application output on the serial port.
 DEBUG (0): [0:0:19.708984415] Serial packet sent.
 
@@ -223,7 +223,7 @@ DEBUG (0): [0:0:29.553298918] Received classification MOVEMENT from node 2 (5 of
 DEBUG (2): [0:0:29.553466764] Packet sent to 0...and ack received.
 DEBUG (0): [0:0:29.553710947] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
 DEBUG (0): [0:0:29.553710947] No Heart Rate variation detected.
-DEBUG (0): [0:0:29.553710947] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:29.553710947] Application output: MOVEMENT.
 DEBUG (0): [0:0:29.553710957] Sending application output on the serial port.
 DEBUG (0): [0:0:29.553710977] Serial packet sent.
 
@@ -376,7 +376,7 @@ DEBUG (0): [0:0:59.104675320] Received classification MOVEMENT from node 4 (4 of
 DEBUG (4): [0:0:59.104843166] Packet sent to 0...and ack received.
 DEBUG (0): [0:0:59.106445322] At least 3 nodes detected MOVEMENT or CRISIS, checking ECG...
 DEBUG (0): [0:0:59.106445322] No Heart Rate variation detected.
-DEBUG (0): [0:0:59.106445322] Application output: NO_MOVEMENT.
+DEBUG (0): [0:0:59.106445322] Application output: MOVEMENT.
 DEBUG (0): [0:0:59.106445332] Sending application output on the serial port.
 DEBUG (0): [0:0:59.106445352] Serial packet sent.
 

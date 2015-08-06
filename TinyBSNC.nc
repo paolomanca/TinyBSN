@@ -486,8 +486,8 @@ module TinyBSNC {
 
             } else {
                 dbg("main", "[%s] No Heart Rate variation detected.\n", sim_time_string());
-                dbg("app_out", "[%s] Application output: NO_MOVEMENT.\n", sim_time_string());
-                class[0] = NO_MOVEMENT;
+                dbg("app_out", "[%s] Application output: MOVEMENT.\n", sim_time_string());
+                class[0] = MOVEMENT;
             }
 
         } else {
